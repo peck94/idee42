@@ -4,9 +4,9 @@ import app.spring.SpringMain;
 import org.springframework.boot.*;
 
 /**
- * Main Spring controller.
+ * Main application class.
  * This class serves as the main entrypoint of the application.
- * It simply launches Spring.
+ * It initializes all components.
  * @author jonathan
  */
 public class Main {
