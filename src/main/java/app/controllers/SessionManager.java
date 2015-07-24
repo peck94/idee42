@@ -132,4 +132,14 @@ public class SessionManager {
     public boolean isLoggedIn(String key) {
         return keys.containsKey(new SessionKey(key));
     }
+    
+    /**
+     * Get user by session key
+     * @param auth Session key
+     * @return User of key
+     */
+    public User getUser(String auth) {
+        SessionKey key = new SessionKey(auth);
+        return keys.get(key).getUser();
+    }
 }
