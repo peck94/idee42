@@ -30,6 +30,7 @@ public class UserController {
     /**
      * Create a new user
      * @param body JSON string representing the user to create
+     * @return Status message
      */
     @RequestMapping(method=POST)
     public Message create(@RequestBody String body) {
@@ -42,7 +43,7 @@ public class UserController {
     /**
      * List all users.
      * TODO: remove this method when in production!
-     * @return 
+     * @return List of users
      */
     @RequestMapping(method=GET)
     public String list() {

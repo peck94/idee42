@@ -28,6 +28,7 @@ public class LoginController {
      * Login as a user
      * @param username Name of user
      * @param password Password of user 
+     * @return Session key
      */
     @RequestMapping(value="/api/login", method=POST)
     public String login(
@@ -46,6 +47,7 @@ public class LoginController {
     /**
      * Log a user out
      * @param auth Session key of user
+     * @return Status message
      */
     @RequestMapping(value="/api/logout", method=POST)
     public Message logout(
