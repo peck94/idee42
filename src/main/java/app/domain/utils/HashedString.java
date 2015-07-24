@@ -36,4 +36,18 @@ public class HashedString {
     public String toString() {
         return hashed;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof HashedString) && !(o instanceof String)) {
+            return false;
+        }
+        
+        return toString().equals(o.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return hashed.hashCode();
+    }
 }

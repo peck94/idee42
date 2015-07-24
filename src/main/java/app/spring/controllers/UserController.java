@@ -3,7 +3,6 @@ package app.spring.controllers;
 import app.controllers.UserManager;
 import app.domain.users.User;
 import app.parsers.UserParser;
-import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +35,11 @@ public class UserController {
         userManager.addUser(user);
     }
     
+    /**
+     * List all users.
+     * TODO: remove this method when in production!
+     * @return 
+     */
     @RequestMapping(method=GET)
     public String list() {
         return parser.toJson(userManager.getUsers());
