@@ -1,5 +1,6 @@
 package app.spring;
 
+import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
 import java.security.NoSuchAlgorithmException;
@@ -12,12 +13,14 @@ import org.springframework.context.annotation.Bean;
  */
 @SpringBootApplication
 public class SpringMain {
-    private UserManager _userManager;
-    private SessionManager _sessionManager;
+    private final UserManager _userManager;
+    private final SessionManager _sessionManager;
+    private final PictureManager _pictureManager;
     
     public SpringMain() throws NoSuchAlgorithmException {
         _userManager = new UserManager();
         _sessionManager = new SessionManager(10 * 60 * 1000);
+        _pictureManager = new PictureManager();
     }
     
     @Bean
@@ -28,5 +31,10 @@ public class SpringMain {
     @Bean
     public SessionManager sessionManager() {
         return _sessionManager;
+    }
+    
+    @Bean
+    public PictureManager pictureManager() {
+        return _pictureManager;
     }
 }
