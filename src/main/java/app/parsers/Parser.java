@@ -38,6 +38,6 @@ public abstract class Parser<T> {
             results.add(element);
         }
         
-        return results.getAsString();
+        return results.toString();
     }
 }

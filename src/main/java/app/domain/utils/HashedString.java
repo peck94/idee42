@@ -24,7 +24,11 @@ public class HashedString {
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
             digest.update(input.getBytes());
             
-            this.hashed = new String(digest.digest());
+            StringBuilder buffer = new StringBuilder();
+            for(byte b: digest.digest()) {
+                buffer.append(String.format("%02X", b));
+            }
+            this.hashed = buffer.toString();
         }
     }
     
