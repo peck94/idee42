@@ -1,5 +1,7 @@
-package app.domain.pictures;
+package app.controllers;
 
+import app.domain.pictures.Picture;
+import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
 import java.util.HashMap;
 import java.util.Map;

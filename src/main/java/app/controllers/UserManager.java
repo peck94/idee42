@@ -1,7 +1,10 @@
-package app.domain.users;
+package app.controllers;
 
+import app.domain.users.User;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Manages the list of users.
@@ -35,9 +38,9 @@ public class UserManager {
     public void addUser(User user) {
         if(!users.containsKey(user.getUsername())) {
             users.put(user.getUsername(), user);
+        }else{
+            throw new RuntimeException("User already exists: " + user.getUsername());
         }
-        
-        throw new RuntimeException("User already exists: " + user.getUsername());
     }
     
     /**
@@ -47,5 +50,9 @@ public class UserManager {
      */
     public boolean exists(String username) {
         return users.containsKey(username);
+    }
+    
+    public Set<User> getUsers() {
+        return new HashSet<>(users.values());
     }
 }
