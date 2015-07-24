@@ -2,9 +2,6 @@ package app.spring;
 
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
-import app.domain.users.Email;
-import app.domain.users.User;
-import app.domain.utils.HashedString;
 import java.security.NoSuchAlgorithmException;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
