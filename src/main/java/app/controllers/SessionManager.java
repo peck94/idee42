@@ -112,11 +112,24 @@ public class SessionManager {
         }
     }
     
+    /**
+     * Logout a user
+     * @param auth Auth string
+     */
     public void logout(String auth) {
         SessionKey key = new SessionKey(auth);
         Session s = keys.get(key);
         
         keys.remove(key);
         sessions.remove(s);
+    }
+    
+    /**
+     * Check whether a key is valid
+     * @param key Key to verify
+     * @return Whether or not the key corresponds to an existing session
+     */
+    public boolean isLoggedIn(String key) {
+        return keys.containsKey(new SessionKey(key));
     }
 }
