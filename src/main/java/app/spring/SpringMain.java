@@ -1,14 +1,12 @@
 package app.spring;
 
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.stereotype.Controller;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Spring main class.
  * @author jonathan
  */
-@Controller
-@EnableAutoConfiguration
+@SpringBootApplication
 public class SpringMain {
     
 }
