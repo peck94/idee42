@@ -2,21 +2,21 @@ package app.domain.pictures;
 
 import app.domain.users.User;
 import app.domain.utils.Association;
-import java.util.LinkedList;
+import java.util.ArrayList;
 
 /**
  * An association between a user and his pictures.
  * @author jonathan
  */
-public class UserPicturesAssociation extends Association<User, LinkedList<Picture>> {
+public class UserPicturesAssociation extends Association<User, ArrayList<Picture>> {
 
     public UserPicturesAssociation(User source) {
-        super(source, new LinkedList<>());
+        super(source, new ArrayList<>());
     }
     
     @Override
-    public LinkedList<Picture> getTarget() {
-        return new LinkedList<>(super.getTarget());
+    public ArrayList<Picture> getTarget() {
+        return new ArrayList<>(super.getTarget());
     }
     
     /**

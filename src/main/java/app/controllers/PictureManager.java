@@ -3,7 +3,9 @@ package app.controllers;
 import app.domain.pictures.Picture;
 import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,9 +15,11 @@ import java.util.Map;
 public class PictureManager {
     // store associations
     private final Map<String, UserPicturesAssociation> assocs;
+    private final List<String> names;
     
     public PictureManager() {
         assocs = new HashMap<>();
+        names = new ArrayList<>();
     }
     
     /**
@@ -27,6 +31,7 @@ public class PictureManager {
         if(!assocs.containsKey(user.getUsername())) {
             assocs.put(user.getUsername(),
                     new UserPicturesAssociation(user));
+            names.add(user.getUsername());
         }
         
         assocs.get(user.getUsername()).addPicture(picture);
@@ -43,5 +48,13 @@ public class PictureManager {
         }
         
         return null;
+    }
+    
+    /**
+     * Get list of names
+     * @return
+     */
+    public List<String> getNames() {
+        return new ArrayList<>(names);
     }
 }
