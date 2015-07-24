@@ -39,6 +39,10 @@ public class LoginController {
         }
     }
     
+    /**
+     * Log a user out
+     * @param auth Session key of user
+     */
     @RequestMapping(value="/api/logout", method=POST)
     public void logout(
         @RequestParam(value="auth") String auth) {
