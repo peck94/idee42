@@ -4,7 +4,7 @@ apply plugin: 'application'
 sourceCompatibility = '1.8'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
-mainClassName = 'app.spring.MainController'
+mainClassName = 'app.main.Main'
 
 repositories {
     mavenCentral()
