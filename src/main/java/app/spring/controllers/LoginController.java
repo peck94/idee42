@@ -2,11 +2,13 @@ package app.spring.controllers;
 
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
+import app.domain.users.SessionKey;
 import app.domain.users.User;
-import java.security.NoSuchAlgorithmException;
+import app.spring.messages.Message;
+import app.spring.messages.OkMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,12 +30,14 @@ public class LoginController {
      * @param password Password of user 
      */
     @RequestMapping(value="/api/login", method=POST)
-    public void login(
+    public String login(
             @RequestParam(value="username") String username,
             @RequestParam(value="password") String password) {
         try{
             User user = userManager.getUser(username);
-            sessionManager.login(user, password);
+            SessionKey key = sessionManager.login(user, password);
+            
+            return key.toString();
         }catch(Exception e) {
             throw new RuntimeException("Invalid credentials for " + username);
         }
@@ -44,8 +48,10 @@ public class LoginController {
      * @param auth Session key of user
      */
     @RequestMapping(value="/api/logout", method=POST)
-    public void logout(
-        @RequestParam(value="auth") String auth) {
+    public Message logout(
+        @RequestHeader(value="auth") String auth) {
         sessionManager.logout(auth);
+        
+        return new OkMessage();
     }
 }

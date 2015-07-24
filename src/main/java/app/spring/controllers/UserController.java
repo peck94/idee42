@@ -3,6 +3,8 @@ package app.spring.controllers;
 import app.controllers.UserManager;
 import app.domain.users.User;
 import app.parsers.UserParser;
+import app.spring.messages.Message;
+import app.spring.messages.OkMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,9 +32,11 @@ public class UserController {
      * @param body JSON string representing the user to create
      */
     @RequestMapping(method=POST)
-    public void create(@RequestBody String body) {
+    public Message create(@RequestBody String body) {
         User user = parser.fromJson(body);
         userManager.addUser(user);
+        
+        return new OkMessage();
     }
     
     /**

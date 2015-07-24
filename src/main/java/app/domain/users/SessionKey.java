@@ -24,11 +24,16 @@ public class SessionKey {
      * @param auth String
      */
     public SessionKey(String auth) {
-        key = new BigInteger(auth);
+        key = new BigInteger(auth, 16);
     }
     
     public BigInteger getKey() {
         return key;
+    }
+    
+    @Override
+    public String toString() {
+        return key.toString(16);
     }
     
     @Override
