@@ -39,7 +39,7 @@ public class LoginController {
         }
     }
     
-    @RequestMapping(value="/api/logout", method=GET)
+    @RequestMapping(value="/api/logout", method=POST)
     public void logout(
         @RequestParam(value="auth") String auth) {
         sessionManager.logout(auth);
