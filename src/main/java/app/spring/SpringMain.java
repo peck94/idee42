@@ -20,7 +20,7 @@ public class SpringMain {
     public SpringMain() throws NoSuchAlgorithmException {
         _userManager = new UserManager();
         _sessionManager = new SessionManager(10 * 60 * 1000);
-        _pictureManager = new PictureManager();
+        _pictureManager = new PictureManager(_userManager);
     }
     
     @Bean
