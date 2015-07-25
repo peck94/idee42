@@ -10,10 +10,14 @@ import app.exceptions.PersistencyException;
  * @author jonathan
  * @param <T> Type of Observable
  */
-public class PersistencyListener<T extends Observable> implements Listener {
+public abstract class PersistencyListener<T extends Observable> implements Listener {
     // store DAO
-    private DataAccessObject dao;
+    private final DataAccessObject dao;
     
+    /**
+     * Create new listener
+     * @param dao DAO associated with this listener
+     */
     public PersistencyListener(DataAccessObject dao) {
         this.dao = dao;
     }
@@ -21,11 +25,17 @@ public class PersistencyListener<T extends Observable> implements Listener {
     @Override
     public void update(Observable o) throws DomainException {
         T model = (T) o;
-        try {
-            dao.update(model);
-        } catch (PersistencyException ex) {
-            throw new DomainException(ex);
+        try{
+            updateModel(model);
+        }catch(PersistencyException e) {
+            throw new DomainException(e);
         }
     }
+    
+    protected DataAccessObject getDAO() {
+        return dao;
+    }
+    
+    protected abstract void updateModel(T model) throws PersistencyException;
     
 }

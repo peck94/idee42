@@ -59,6 +59,12 @@ public class PictureManager extends Controller {
         
         assocs.get(user.getUsername()).addPicture(picture);
         pictures.put(picture.getId(), picture);
+        
+        try{
+            getCommunicator().registerPicture(picture);
+        }catch(DomainException e) {
+            throw new ControllerException(e);
+        }
     }
     
     /**

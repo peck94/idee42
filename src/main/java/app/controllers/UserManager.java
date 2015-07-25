@@ -3,6 +3,7 @@ package app.controllers;
 import app.domain.PersistencyCommunicator;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
+import app.exceptions.DomainException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,11 @@ public class UserManager extends Controller {
     public void addUser(User user) throws ControllerException {
         if(!users.containsKey(user.getUsername())) {
             users.put(user.getUsername(), user);
+            try{
+                getCommunicator().registerUser(user);
+            }catch(DomainException e) {
+                throw new ControllerException(e);
+            }
         }else{
             throw new ControllerException("User already exists: " + user.getUsername());
         }
@@ -56,7 +62,7 @@ public class UserManager extends Controller {
     public boolean exists(String username) {
         return users.containsKey(username);
     }
-    
+
     public List<User> getUsers() {
         return new ArrayList<>(users.values());
     }

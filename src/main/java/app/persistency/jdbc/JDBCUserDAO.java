@@ -110,4 +110,16 @@ public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
         }
     }
     
+    @Override
+    public boolean exists(Long id) throws PersistencyException {
+        try(PreparedStatement s = getConnection().prepareStatement(GET)) {
+            s.setString(1, id.toString());
+            
+            ResultSet rs = s.executeQuery();
+            return rs.next();
+        }catch(SQLException e) {
+            throw new PersistencyException(e);
+        }
+    }
+    
 }

@@ -118,4 +118,16 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             throw new PersistencyException(e);
         }
     }
+
+    @Override
+    public boolean exists(BigInteger id) throws PersistencyException {
+        try(PreparedStatement s = getConnection().prepareStatement(GET)) {
+            s.setString(1, id.toString());
+            
+            ResultSet rs = s.executeQuery();
+            return rs.next();
+        }catch(SQLException e) {
+            throw new PersistencyException(e);
+        }
+    }
 }

@@ -45,4 +45,12 @@ public interface DataAccessObject<T, K> {
      * @throws app.exceptions.PersistencyException
      */
     List<T> getAll() throws PersistencyException;
+    
+    /**
+     * Check whether an object exists in persistency
+     * @param id ID of object
+     * @return Whether or not the object exists
+     * @throws PersistencyException 
+     */
+    boolean exists(K id) throws PersistencyException;
 }
