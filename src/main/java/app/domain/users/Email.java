@@ -12,9 +12,9 @@ public class Email {
     // regex every email must satisfy
     private static final Pattern pattern;
     // store matcher
-    private Matcher matcher;
+    private final Matcher matcher;
     // store e-mail address string
-    private String email;
+    private final String email;
     
     static{
         // initialize regex
