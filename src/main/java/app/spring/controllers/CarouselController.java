@@ -4,6 +4,8 @@ import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.domain.pictures.Picture;
 import app.domain.users.User;
+import app.exceptions.ControllerException;
+import app.exceptions.SpringException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,15 +28,20 @@ public class CarouselController {
      * Retrieve a random picture
      * @param auth Session key
      * @return Random picture
+     * @throws app.exceptions.SpringException If a picture can't be retrieved
      */
     @RequestMapping(method=GET)
     public Picture random(
-        @RequestHeader(value="auth") String auth) {
+        @RequestHeader(value="auth") String auth) throws SpringException {
         if(sessionManager.isLoggedIn(auth)) {
-            User user = sessionManager.getUser(auth);
-            return pictureManager.getRandomPicture(user);
+            try{
+                User user = sessionManager.getUser(auth);
+                return pictureManager.getRandomPicture(user);
+            }catch(ControllerException ex) {
+                throw new SpringException(ex);
+            }
         }else{
-            throw new RuntimeException("Invalid session");
+            throw new SpringException("Invalid session");
         }
     }
 }

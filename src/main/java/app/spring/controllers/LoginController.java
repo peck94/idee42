@@ -4,6 +4,8 @@ import app.controllers.SessionManager;
 import app.controllers.UserManager;
 import app.domain.users.SessionKey;
 import app.domain.users.User;
+import app.exceptions.ControllerException;
+import app.exceptions.SpringException;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,18 +31,20 @@ public class LoginController {
      * @param username Name of user
      * @param password Password of user 
      * @return Session key
+     * @throws app.exceptions.SpringException If credentials are invalid
      */
     @RequestMapping(value="/api/login", method=POST)
     public String login(
             @RequestParam(value="username") String username,
-            @RequestParam(value="password") String password) {
+            @RequestParam(value="password") String password)
+        throws SpringException{
         try{
             User user = userManager.getUser(username);
             SessionKey key = sessionManager.login(user, password);
             
             return key.toString();
         }catch(Exception e) {
-            throw new RuntimeException("Invalid credentials for " + username);
+            throw new SpringException("Invalid credentials for " + username);
         }
     }
     
@@ -48,12 +52,17 @@ public class LoginController {
      * Log a user out
      * @param auth Session key of user
      * @return Status message
+     * @throws app.exceptions.SpringException
      */
     @RequestMapping(value="/api/logout", method=POST)
     public Message logout(
-        @RequestHeader(value="auth") String auth) {
-        sessionManager.logout(auth);
+        @RequestHeader(value="auth") String auth) throws SpringException {
+        try{
+            sessionManager.logout(auth);
         
-        return new OkMessage();
+            return new OkMessage();
+        }catch(ControllerException ex) {
+            throw new SpringException(ex);
+        }
     }
 }

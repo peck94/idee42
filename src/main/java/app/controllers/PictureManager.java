@@ -3,6 +3,7 @@ package app.controllers;
 import app.domain.pictures.Picture;
 import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
+import app.exceptions.ControllerException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -50,26 +51,30 @@ public class PictureManager {
      * Get all pictures associated with a certain user.
      * @param username Name of user
      * @return Association of pictures
+     * @throws app.exceptions.ControllerException If the user doesn't have any pictures
      */
-    public UserPicturesAssociation getPictures(String username) {
+    public UserPicturesAssociation getPictures(String username)
+        throws ControllerException {
         if(assocs.containsKey(username)) {
             return assocs.get(username);
         }
         
-        return null;
+        throw new ControllerException("No pictures for user " + username);
     }
     
     /**
      * Get a random picture.
      * The pictures that belong to the user requesting the random picture are
      * excluded, so that users will never rate their own pictures.
+     * TODO: fix this algorithm
      * @param exclude User to exclude
      * @return Random picture not belonging to the excluded user
+     * @throws app.exceptions.ControllerException If a random picture can't be retrieved
      */
-    public Picture getRandomPicture(User exclude) {
+    public Picture getRandomPicture(User exclude) throws ControllerException {
         List<User> users = userManager.getUsers();
         if(users.size() < 2) {
-            throw new RuntimeException("Not enough users");
+            throw new ControllerException("Not enough users for random picture");
         }
         
         User selected;

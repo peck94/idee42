@@ -4,6 +4,7 @@ import app.domain.users.Session;
 import app.domain.users.SessionKey;
 import app.domain.users.User;
 import app.domain.utils.HashedString;
+import app.exceptions.ControllerException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Date;
@@ -87,37 +88,47 @@ public class SessionManager {
      * Login a user
      * @param user User to login
      * @param password Plaintext password
-     * @throws NoSuchAlgorithmException 
+     * @return Session key for user 
+     * @throws app.exceptions.ControllerException 
      */
-    public SessionKey login(User user, String password) throws NoSuchAlgorithmException {
-        HashedString hashedPassword = new HashedString(password, false);
-        if(user.getPassword().equals(hashedPassword)) {
-            SessionKey key;
-            do{
-                key = new SessionKey(rng);
-            }while(keys.containsKey(key));
-            
-            Session session = new Session(user, key);
-            sessions.add(session);
-            keys.put(key, session);
-            
-            if(sessions.size() == 1) {
-                Thread t = new Thread(new Validator());
-                t.start();
+    public SessionKey login(User user, String password) throws ControllerException {
+        try {
+            HashedString hashedPassword = new HashedString(password, false);
+            if(user.getPassword().equals(hashedPassword)) {
+                SessionKey key;
+                do{
+                    key = new SessionKey(rng);
+                }while(keys.containsKey(key));
+
+                Session session = new Session(user, key);
+                sessions.add(session);
+                keys.put(key, session);
+
+                if(sessions.size() == 1) {
+                    Thread t = new Thread(new Validator());
+                    t.start();
+                }
+
+                return key;
+            }else{
+                throw new ControllerException("Invalid credentials for " + user.getUsername());
             }
-            
-            return key;
-        }else{
-            throw new RuntimeException("Invalid credentials for " + user.getUsername());
+        }catch(NoSuchAlgorithmException e) {
+            throw new ControllerException("Password can't be hashed");
         }
     }
     
     /**
      * Logout a user
      * @param auth Auth string
+     * @throws app.exceptions.ControllerException
      */
-    public void logout(String auth) {
+    public void logout(String auth) throws ControllerException {
         SessionKey key = new SessionKey(auth);
+        if(!keys.containsKey(key)) {
+            throw new ControllerException("Invalid key");
+        }
+        
         Session s = keys.get(key);
         
         keys.remove(key);
@@ -137,9 +148,14 @@ public class SessionManager {
      * Get user by session key
      * @param auth Session key
      * @return User of key
+     * @throws app.exceptions.ControllerException
      */
-    public User getUser(String auth) {
+    public User getUser(String auth) throws ControllerException {
         SessionKey key = new SessionKey(auth);
-        return keys.get(key).getUser();
+        if(keys.containsKey(key)) {
+            return keys.get(key).getUser();
+        }else{
+            throw new ControllerException("User not logged in: " + auth);
+        }
     }
 }

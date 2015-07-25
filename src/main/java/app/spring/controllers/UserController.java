@@ -2,6 +2,8 @@ package app.spring.controllers;
 
 import app.controllers.UserManager;
 import app.domain.users.User;
+import app.exceptions.ControllerException;
+import app.exceptions.SpringException;
 import app.parsers.UserParser;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
@@ -19,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value="/api/user")
 public class UserController {
-    private UserParser parser;
+    private final UserParser parser;
     @Autowired
     private UserManager userManager;
     
@@ -31,11 +33,16 @@ public class UserController {
      * Create a new user
      * @param body JSON string representing the user to create
      * @return Status message
+     * @throws app.exceptions.SpringException
      */
     @RequestMapping(method=POST)
-    public Message create(@RequestBody String body) {
+    public Message create(@RequestBody String body) throws SpringException {
         User user = parser.fromJson(body);
-        userManager.addUser(user);
+        try {
+            userManager.addUser(user);
+        } catch (ControllerException ex) {
+            throw new SpringException(ex);
+        }
         
         return new OkMessage();
     }

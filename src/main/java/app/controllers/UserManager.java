@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.domain.users.User;
+import app.exceptions.ControllerException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public class UserManager {
     // store known users
-    private Map<String, User> users;
+    private final Map<String, User> users;
     
     public UserManager() {
         users = new HashMap<>();
@@ -22,24 +23,26 @@ public class UserManager {
      * Get a user by name
      * @param username Username
      * @return User corresponding to username
+     * @throws app.exceptions.ControllerException
      */
-    public User getUser(String username) {
+    public User getUser(String username) throws ControllerException {
         if(users.containsKey(username)) {
             return users.get(username);
         }
         
-        throw new RuntimeException("Unknown user: " + username);
+        throw new ControllerException("Unknown user: " + username);
     }
     
     /**
      * Add a user to the repository
      * @param user User to add
+     * @throws app.exceptions.ControllerException
      */
-    public void addUser(User user) {
+    public void addUser(User user) throws ControllerException {
         if(!users.containsKey(user.getUsername())) {
             users.put(user.getUsername(), user);
         }else{
-            throw new RuntimeException("User already exists: " + user.getUsername());
+            throw new ControllerException("User already exists: " + user.getUsername());
         }
     }
     

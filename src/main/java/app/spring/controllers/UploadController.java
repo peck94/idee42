@@ -3,7 +3,8 @@ package app.spring.controllers;
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.domain.users.User;
-import app.spring.messages.ErrorMessage;
+import app.exceptions.ControllerException;
+import app.exceptions.SpringException;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
 import java.io.IOException;
@@ -32,19 +33,23 @@ public class UploadController {
      * @param file File to upload
      * @param auth Session key
      * @return Message
-     * @throws IOException 
+     * @throws app.exceptions.SpringException For invalid credentials
      */
     @RequestMapping(method=POST)
     public Message upload(
         @RequestParam(value="file") MultipartFile file,
-        @RequestHeader(value="auth") String auth) throws IOException {
+        @RequestHeader(value="auth") String auth) throws SpringException {
         if(sessionManager.isLoggedIn(auth)) {
-            User user = sessionManager.getUser(auth);
-            pictureManager.upload(user, file);
+            try{
+                User user = sessionManager.getUser(auth);
+                pictureManager.upload(user, file);
             
-            return new OkMessage();
+                return new OkMessage();
+            }catch(ControllerException | IOException ex) {
+                throw new SpringException(ex);
+            }
         }
         
-        return new ErrorMessage("Invalid session");
+        throw new SpringException("Invalid session");
     }
 }
