@@ -3,6 +3,9 @@ package app.domain.pictures;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import javax.imageio.ImageIO;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +23,8 @@ public class Picture {
     private final long likes;
     // store number of dislikes
     private final long dislikes;
+    // store unique id
+    private BigInteger id;
     
     /**
      * Create picture from file
@@ -31,6 +36,14 @@ public class Picture {
         this.date = new Date();
         this.likes = 0;
         this.dislikes = 0;
+        
+        try{
+            MessageDigest digest = MessageDigest.getInstance("SHA-512");
+            digest.update(file.getBytes());
+            this.id = new BigInteger(digest.digest());
+        }catch(NoSuchAlgorithmException e) {
+            System.out.println(e);
+        }
     }
     
     /**
@@ -39,12 +52,14 @@ public class Picture {
      * @param date Date of upload
      * @param likes No. of likes
      * @param dislikes No. of dislikes
+     * @param id ID
      */
-    public Picture(Image image, Date date, long likes, long dislikes) {
+    public Picture(Image image, Date date, long likes, long dislikes, BigInteger id) {
         this.image = image;
         this.date = date;
         this.likes = likes;
         this.dislikes = dislikes;
+        this.id = id;
     }
     
     public Image getImage() {
@@ -61,5 +76,9 @@ public class Picture {
     
     public long getDislikes() {
         return dislikes;
+    }
+    
+    public BigInteger getId() {
+        return id;
     }
 }

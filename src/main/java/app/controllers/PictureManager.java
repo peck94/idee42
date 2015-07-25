@@ -15,6 +15,7 @@ import java.util.Map;
 public class PictureManager {
     // store associations
     private final Map<String, UserPicturesAssociation> assocs;
+    // store usernames
     private final List<String> names;
     
     public PictureManager() {
