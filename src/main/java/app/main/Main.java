@@ -1,6 +1,8 @@
 package app.main;
 
 import app.spring.SpringMain;
+import java.io.IOException;
+import java.sql.SQLException;
 import org.springframework.boot.*;
 
 /**
@@ -10,7 +12,8 @@ import org.springframework.boot.*;
  * @author jonathan
  */
 public class Main {
-    public void run(String[] args) {
+    public void run(String[] args) throws IOException, ClassNotFoundException, SQLException {
+        // launch application
         SpringApplication.run(SpringMain.class, args);
     }
     
