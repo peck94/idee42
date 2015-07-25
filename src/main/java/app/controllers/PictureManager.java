@@ -5,6 +5,7 @@ import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class PictureManager {
     private final UserManager userManager;
     // store associations
     private final Map<String, UserPicturesAssociation> assocs;
+    // store pictures
+    private final Map<BigInteger, Picture> pictures;
     // store RNG
     private final Random rng;
     
@@ -30,6 +33,7 @@ public class PictureManager {
     public PictureManager(UserManager userManager) {
         this.userManager = userManager;
         assocs = new HashMap<>();
+        pictures = new HashMap<>();
         rng = new Random();
     }
     
@@ -37,14 +41,20 @@ public class PictureManager {
      * Add an entry to the map
      * @param user Owner of the picture
      * @param picture Picture to add
+     * @throws app.exceptions.ControllerException
      */
-    public void addEntry(User user, Picture picture) {
+    public void addEntry(User user, Picture picture) throws ControllerException {
+        if(pictures.containsKey(picture.getId())) {
+            throw new ControllerException("Duplicate picture: " + picture.getId());
+        }
+        
         if(!assocs.containsKey(user.getUsername())) {
             assocs.put(user.getUsername(),
                     new UserPicturesAssociation(user));
         }
         
         assocs.get(user.getUsername()).addPicture(picture);
+        pictures.put(picture.getId(), picture);
     }
     
     /**
@@ -95,9 +105,42 @@ public class PictureManager {
      * @param user Owner
      * @param file Image to upload
      * @throws IOException 
+     * @throws app.exceptions.ControllerException 
      */
-    public void upload(User user, MultipartFile file) throws IOException {
+    public void upload(User user, MultipartFile file) throws IOException, ControllerException {
         Picture picture = new Picture(file);
         addEntry(user, picture);
+    }
+    
+    /**
+     * Get picture by ID
+     * @param id ID of picture
+     * @return Picture with this ID
+     * @throws ControllerException Picture not found
+     */
+    private Picture getPictureById(BigInteger id) throws ControllerException {
+        if(pictures.containsKey(id)) {
+            return pictures.get(id);
+        }else{
+            throw new ControllerException("No such picture: " + id);
+        }
+    }
+    
+    /**
+     * Like a picture
+     * @param id ID of picture to like
+     * @throws app.exceptions.ControllerException
+     */
+    public void likePicture(BigInteger id) throws ControllerException {
+        getPictureById(id).like();
+    }
+    
+    /**
+     * Dislike a picture
+     * @param id ID of picture to dislike
+     * @throws app.exceptions.ControllerException
+     */
+    public void dislikePicture(BigInteger id) throws ControllerException {
+        getPictureById(id).dislike();
     }
 }

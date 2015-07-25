@@ -17,9 +17,9 @@ public class Picture {
     // store time of upload
     private final Date date;
     // store number of likes
-    private final long likes;
+    private long likes;
     // store number of dislikes
-    private final long dislikes;
+    private long dislikes;
     // store unique id
     private BigInteger id;
     
@@ -77,5 +77,13 @@ public class Picture {
     
     public BigInteger getId() {
         return id;
+    }
+    
+    public void like() {
+        likes++;
+    }
+    
+    public void dislike() {
+        dislikes++;
     }
 }
