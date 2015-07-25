@@ -54,4 +54,17 @@ public class User extends Observable {
     public Email getEmail() {
         return email;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof User)) {
+            return false;
+        }
+        
+        User u = (User) o;
+        return (u.getUsername().equals(getUsername()) &&
+                u.getPassword().equals(getPassword()) &&
+                u.getEmail().equals(getEmail()) &&
+                u.getId() == getId());
+    }
 }

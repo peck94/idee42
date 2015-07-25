@@ -42,4 +42,9 @@ public class Email {
     public String toString() {
         return email;
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        return toString().equals(o.toString());
+    }
 }

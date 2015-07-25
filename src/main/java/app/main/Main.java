@@ -1,6 +1,5 @@
 package app.main;
 
-import app.spring.SpringMain;
 import java.io.IOException;
 import java.sql.SQLException;
 import org.springframework.boot.*;

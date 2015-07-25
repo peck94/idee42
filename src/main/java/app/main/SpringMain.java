@@ -1,17 +1,12 @@
-package app.spring;
+package app.main;
 
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
 import app.domain.PersistencyCommunicator;
-import app.domain.users.User;
-import app.exceptions.PersistencyException;
 import app.persistency.DataAccessProvider;
 import app.persistency.jdbc.JDBCDataAccessContext;
 import app.persistency.jdbc.JDBCDataAccessProvider;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.Properties;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +25,7 @@ public class SpringMain {
     public SpringMain() throws Exception {
         // load config
         Properties config = new Properties();
-        config.load(SpringMain.class.getResourceAsStream("application.properties"));
+        config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.properties"));
         
         // init persistency
         String host = config.getProperty("jdbc.host");
