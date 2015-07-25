@@ -3,10 +3,7 @@ package app.spring.controllers;
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.domain.pictures.Picture;
-import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
-import java.util.List;
-import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,11 +21,6 @@ public class CarouselController {
     private SessionManager sessionManager;
     @Autowired
     private PictureManager pictureManager;
-    private Random rng;
-    
-    public CarouselController() {
-        rng = new Random();
-    }
     
     /**
      * Retrieve a random picture
@@ -38,22 +30,11 @@ public class CarouselController {
     @RequestMapping(method=GET)
     public Picture random(
         @RequestHeader(value="auth") String auth) {
-        List<String> names = pictureManager.getNames();
-        if(names.size() < 2) {
-            throw new RuntimeException("Not enough users");
+        if(sessionManager.isLoggedIn(auth)) {
+            User user = sessionManager.getUser(auth);
+            return pictureManager.getRandomPicture(user);
+        }else{
+            throw new RuntimeException("Invalid session");
         }
-        
-        String name;
-        User user = sessionManager.getUser(auth);
-        do{
-            int index = rng.nextInt(names.size());
-            name = names.get(index);
-        }while(user.getUsername().equals(name));
-        
-        UserPicturesAssociation assoc = pictureManager.getPictures(name);
-        List<Picture> pix = assoc.getTarget();
-        int index = rng.nextInt(pix.size());
-        
-        return pix.get(index);
     }
 }

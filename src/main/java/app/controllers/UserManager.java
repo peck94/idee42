@@ -1,10 +1,10 @@
 package app.controllers;
 
 import app.domain.users.User;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Manages the list of users.
@@ -52,7 +52,7 @@ public class UserManager {
         return users.containsKey(username);
     }
     
-    public Set<User> getUsers() {
-        return new HashSet<>(users.values());
+    public List<User> getUsers() {
+        return new ArrayList<>(users.values());
     }
 }

@@ -2,8 +2,8 @@ package app.spring.controllers;
 
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;
-import app.domain.pictures.Picture;
 import app.domain.users.User;
+import app.spring.messages.ErrorMessage;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
 import java.io.IOException;
@@ -38,10 +38,13 @@ public class UploadController {
     public Message upload(
         @RequestParam(value="file") MultipartFile file,
         @RequestHeader(value="auth") String auth) throws IOException {
-        User user = sessionManager.getUser(auth);
-        Picture picture = new Picture(file);
-        pictureManager.addEntry(user, picture);
+        if(sessionManager.isLoggedIn(auth)) {
+            User user = sessionManager.getUser(auth);
+            pictureManager.upload(user, file);
+            
+            return new OkMessage();
+        }
         
-        return new OkMessage();
+        return new ErrorMessage("Invalid session");
     }
 }
