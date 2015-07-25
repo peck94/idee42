@@ -2,6 +2,7 @@ package app.persistency;
 
 import app.domain.Listener;
 import app.domain.Observable;
+import app.exceptions.DomainException;
 import app.exceptions.PersistencyException;
 
 /**
@@ -18,9 +19,13 @@ public class PersistencyListener<T extends Observable> implements Listener {
     }
 
     @Override
-    public void update(Observable o) throws PersistencyException {
+    public void update(Observable o) throws DomainException {
         T model = (T) o;
-        dao.update(model);
+        try {
+            dao.update(model);
+        } catch (PersistencyException ex) {
+            throw new DomainException(ex);
+        }
     }
     
 }

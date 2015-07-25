@@ -1,6 +1,6 @@
 package app.domain;
 
-import app.exceptions.PersistencyException;
+import app.exceptions.DomainException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -35,9 +35,9 @@ public abstract class Observable {
     
     /**
      * Update all listeners.
-     * @throws app.exceptions.PersistencyException
+     * @throws app.exceptions.DomainException
      */
-    public void invalidate() throws PersistencyException {
+    public void invalidate() throws DomainException {
         for(Listener l: listeners) {
             l.update(this);
         }

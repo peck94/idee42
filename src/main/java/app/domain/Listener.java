@@ -1,6 +1,6 @@
 package app.domain;
 
-import app.exceptions.PersistencyException;
+import app.exceptions.DomainException;
 
 /**
  * An interface for classes that listen to some observable.
@@ -10,7 +10,7 @@ public interface Listener {
     /**
      * Notify the listener that the model has changed.
      * @param o The model that changed
-     * @throws app.exceptions.PersistencyException If the update fails
+     * @throws app.exceptions.DomainException If update fails
      */
-    void update(Observable o) throws PersistencyException;
+    void update(Observable o) throws DomainException;
 }

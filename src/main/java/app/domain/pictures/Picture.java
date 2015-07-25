@@ -1,6 +1,7 @@
 package app.domain.pictures;
 
 import app.domain.Observable;
+import app.exceptions.DomainException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -84,8 +85,9 @@ public class Picture extends Observable {
     /**
      * Cast a like for this picture.
      * Invalidates the model.
+     * @throws app.exceptions.DomainException
      */
-    public void like() {
+    public void like() throws DomainException {
         likes++;
         invalidate();
     }
@@ -93,8 +95,9 @@ public class Picture extends Observable {
     /**
      * Cast a dislike for this picture.
      * Invalidates the model.
+     * @throws app.exceptions.DomainException
      */
-    public void dislike() {
+    public void dislike() throws DomainException {
         dislikes++;
         invalidate();
     }
