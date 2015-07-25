@@ -13,9 +13,13 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class Picture {
     // store the actual image
-    private Image image;
+    private final Image image;
     // store time of upload
-    private Date date;
+    private final Date date;
+    // store number of likes
+    private final long likes;
+    // store number of dislikes
+    private final long dislikes;
     
     /**
      * Create picture from file
@@ -24,6 +28,16 @@ public class Picture {
      */
     public Picture(MultipartFile file) throws IOException {
         this.image = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+        this.date = new Date();
+        this.likes = 0;
+        this.dislikes = 0;
+    }
+    
+    public Picture(Image image, Date date, long likes, long dislikes) {
+        this.image = image;
+        this.date = date;
+        this.likes = likes;
+        this.dislikes = dislikes;
     }
     
     public Image getImage() {
@@ -32,5 +46,13 @@ public class Picture {
     
     public Date getDate() {
         return date;
+    }
+    
+    public long getLikes() {
+        return likes;
+    }
+    
+    public long getDislikes() {
+        return dislikes;
     }
 }
