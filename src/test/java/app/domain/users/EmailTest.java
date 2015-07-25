@@ -42,13 +42,10 @@ public class EmailTest {
      */
     @Test
     public void testVerify() {
-        System.out.println("verify");
-        Email instance = null;
-        boolean expResult = false;
-        boolean result = instance.verify();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        assertTrue(new Email("kaka@pipi.com").verify());
+        assertFalse(new Email("shit").verify());
+        assertFalse(new Email("kut@").verify());
+        assertFalse(new Email("kut@.c").verify());
     }
 
     /**
@@ -56,13 +53,9 @@ public class EmailTest {
      */
     @Test
     public void testToString() {
-        System.out.println("toString");
-        Email instance = null;
-        String expResult = "";
-        String result = instance.toString();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        String email = "kaka@pipi.com";
+        
+        assertEquals(email, new Email(email).toString());
     }
     
 }
