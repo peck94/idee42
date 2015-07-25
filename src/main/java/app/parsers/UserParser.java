@@ -5,6 +5,7 @@ import app.domain.users.Email;
 import app.domain.utils.HashedString;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import java.text.ParseException;
 
 /**
  * Parser for user objects.
@@ -13,7 +14,7 @@ import com.google.gson.JsonParser;
 public class UserParser extends Parser<User> {
 
     @Override
-    public String toJson(User user) {
+    public String toJson(User user) throws ParseException {
         JsonObject object = new JsonObject();
         object.addProperty("id", user.getId());
         object.addProperty("username", user.getUsername());
@@ -24,7 +25,7 @@ public class UserParser extends Parser<User> {
     }
 
     @Override
-    public User fromJson(String json) {
+    public User fromJson(String json) throws ParseException {
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
         
         try{

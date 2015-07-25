@@ -7,6 +7,7 @@ import app.exceptions.SpringException;
 import app.parsers.UserParser;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
+import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,10 +38,10 @@ public class UserController {
      */
     @RequestMapping(method=POST)
     public Message create(@RequestBody String body) throws SpringException {
-        User user = parser.fromJson(body);
         try {
+            User user = parser.fromJson(body);
             userManager.addUser(user);
-        } catch (ControllerException ex) {
+        } catch (ControllerException | ParseException ex) {
             throw new SpringException(ex);
         }
         
@@ -51,9 +52,14 @@ public class UserController {
      * List all users.
      * TODO: remove this method when in production!
      * @return List of users
+     * @throws app.exceptions.SpringException
      */
     @RequestMapping(method=GET)
-    public String list() {
-        return parser.toJsonArray(userManager.getUsers());
+    public String list() throws SpringException {
+        try{
+            return parser.toJsonArray(userManager.getUsers());
+        }catch(ParseException ex) {
+            throw new SpringException(ex);
+        }
     }
 }

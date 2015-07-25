@@ -7,6 +7,7 @@ import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
 import app.parsers.PictureParser;
+import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,7 +46,7 @@ public class CarouselController {
                 Picture picture = pictureManager.getRandomPicture(user);
                 
                 return parser.toJson(picture);
-            }catch(ControllerException ex) {
+            }catch(ControllerException | ParseException ex) {
                 throw new SpringException(ex);
             }
         }else{

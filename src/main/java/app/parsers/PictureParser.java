@@ -1,11 +1,12 @@
 package app.parsers;
 
 import app.domain.pictures.Picture;
+import app.domain.utils.DateConverter;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.Base64;
-import java.util.Date;
 
 /**
  * Parser for Picture objects.
@@ -14,7 +15,7 @@ import java.util.Date;
 public class PictureParser extends Parser<Picture> {
 
     @Override
-    public String toJson(Picture object) {
+    public String toJson(Picture object) throws ParseException {
         byte[] encoded = Base64.getEncoder().encode(object.getImage());
         
         JsonObject json = new JsonObject();
@@ -22,20 +23,20 @@ public class PictureParser extends Parser<Picture> {
         json.addProperty("data", new String(encoded));
         json.addProperty("likes", object.getLikes());
         json.addProperty("dislikes", object.getDislikes());
-        json.addProperty("date", object.getDate().toString());
+        json.addProperty("date", DateConverter.fromDate(object.getDate()));
         
         return json.toString();
     }
 
     @Override
-    public Picture fromJson(String json) {
+    public Picture fromJson(String json) throws ParseException {
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
         
         byte[] decoded = Base64.getDecoder().decode(object.get("data").getAsString());
         
         Picture picture = new Picture(
                 decoded,
-                new Date(object.get("date").getAsString()),
+                DateConverter.toDate(object.get("date").getAsString()),
                 object.get("likes").getAsLong(),
                 object.get("dislikes").getAsLong(),
                 new BigInteger(object.get("id").getAsString())

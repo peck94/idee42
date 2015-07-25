@@ -12,7 +12,7 @@ public class DateConverter {
     private static final SimpleDateFormat format;
     
     static {
-        format = new SimpleDateFormat();
+        format = new SimpleDateFormat("d/M/y H:m:s:S Z");
     }
     
     /**
