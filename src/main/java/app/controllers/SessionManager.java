@@ -53,7 +53,7 @@ public class SessionManager {
                 while(itr.hasNext()) {
                     Session s = itr.next();
                     long diff = d.getTime() - s.getDate().getTime();
-                    if(diff > timeout) {
+                    if(diff > SessionManager.this.timeout) {
                         keys.remove(s.getKey());
                         itr.remove();
                     }else{
