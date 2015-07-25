@@ -5,7 +5,12 @@
  */
 package app.parsers;
 
+import app.domain.users.Email;
 import app.domain.users.User;
+import app.domain.utils.HashedString;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -43,30 +48,41 @@ public class UserParserTest {
      * Test of toJson method, of class UserParser.
      */
     @Test
-    public void testToJson() throws ParseException {
-        System.out.println("toJson");
-        User user = null;
-        UserParser instance = new UserParser();
-        String expResult = "";
-        String result = instance.toJson(user);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testToJson() throws ParseException, NoSuchAlgorithmException {
+        User user = new User(0, "test", new HashedString("lol", false), new Email("kaka@pipi.com"));
+        UserParser parser = new UserParser();
+        
+        String json = parser.toJson(user);
+        JsonObject object = new JsonParser().parse(json).getAsJsonObject();
+        assertEquals(object.get("id").getAsLong(), user.getId());
+        assertEquals(object.get("username").getAsString(), user.getUsername());
+        assertEquals(object.get("password").getAsString(), user.getPassword().toString());
+        assertEquals(object.get("email").getAsString(), user.getEmail().toString());
     }
 
     /**
      * Test of fromJson method, of class UserParser.
      */
     @Test
-    public void testFromJson() throws ParseException {
-        System.out.println("fromJson");
-        String json = "";
-        UserParser instance = new UserParser();
-        User expResult = null;
-        User result = instance.fromJson(json);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testFromJson() throws ParseException, NoSuchAlgorithmException {
+        long id = 0;
+        String username = "test";
+        String password = "yolo";
+        HashedString hashedPassword = new HashedString(password, false);
+        String email = "kaka@pipi.com";
+        
+        JsonObject object = new JsonObject();
+        object.addProperty("username", username);
+        object.addProperty("password", password);
+        object.addProperty("email", email);
+        object.addProperty("id", id);
+        
+        UserParser parser = new UserParser();
+        User user = parser.fromJson(object.toString());
+        assertEquals(id, user.getId());
+        assertEquals(username, user.getUsername());
+        assertEquals(hashedPassword.toString(), user.getPassword().toString());
+        assertEquals(email, user.getEmail().toString());
     }
     
 }
