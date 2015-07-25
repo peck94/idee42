@@ -1,5 +1,6 @@
 package app.domain;
 
+import app.exceptions.PersistencyException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,8 +35,9 @@ public abstract class Observable {
     
     /**
      * Update all listeners.
+     * @throws app.exceptions.PersistencyException
      */
-    public void invalidate() {
+    public void invalidate() throws PersistencyException {
         for(Listener l: listeners) {
             l.update(this);
         }
