@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.domain.PersistencyCommunicator;
 import app.domain.users.Session;
 import app.domain.users.SessionKey;
 import app.domain.users.User;
@@ -34,7 +35,7 @@ import java.util.Map;
  * upon generating a new session.
  * @author jonathan
  */
-public class SessionManager {
+public class SessionManager extends Controller {
     // store sessions
     private final LinkedList<Session> sessions;
     private final Map<SessionKey, Session> keys;
@@ -75,9 +76,11 @@ public class SessionManager {
     
     /**
      * Create a new session manager
+     * @param communicator
      * @param timeout Timeout value for session expiration
      */
-    public SessionManager(long timeout) {
+    public SessionManager(PersistencyCommunicator communicator, long timeout) {
+        super(communicator);
         sessions = new LinkedList<>();
         keys = new HashMap<>();
         rng = new SecureRandom();

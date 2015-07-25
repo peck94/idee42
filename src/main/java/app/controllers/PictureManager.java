@@ -1,9 +1,11 @@
 package app.controllers;
 
+import app.domain.PersistencyCommunicator;
 import app.domain.pictures.Picture;
 import app.domain.pictures.UserPicturesAssociation;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
+import app.exceptions.DomainException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Stores all pictures and their associated users.
  * @author jonathan
  */
-public class PictureManager {
+public class PictureManager extends Controller {
     // store user manager
     private final UserManager userManager;
     // store associations
@@ -28,9 +30,11 @@ public class PictureManager {
     
     /**
      * Create new picture manager
+     * @param communicator
      * @param userManager User manager
      */
-    public PictureManager(UserManager userManager) {
+    public PictureManager(PersistencyCommunicator communicator, UserManager userManager) {
+        super(communicator);
         this.userManager = userManager;
         assocs = new HashMap<>();
         pictures = new HashMap<>();
@@ -132,7 +136,11 @@ public class PictureManager {
      * @throws app.exceptions.ControllerException
      */
     public void likePicture(BigInteger id) throws ControllerException {
-        getPictureById(id).like();
+        try{
+            getPictureById(id).like();
+        }catch(DomainException e) {
+            throw new ControllerException(e);
+        }
     }
     
     /**
@@ -141,6 +149,10 @@ public class PictureManager {
      * @throws app.exceptions.ControllerException
      */
     public void dislikePicture(BigInteger id) throws ControllerException {
-        getPictureById(id).dislike();
+        try{
+            getPictureById(id).dislike();
+        }catch(DomainException e) {
+            throw new ControllerException(e);
+        }
     }
 }

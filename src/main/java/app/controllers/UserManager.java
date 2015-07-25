@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.domain.PersistencyCommunicator;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
 import java.util.ArrayList;
@@ -11,11 +12,12 @@ import java.util.Map;
  * Manages the list of users.
  * @author jonathan
  */
-public class UserManager {
+public class UserManager extends Controller {
     // store known users
     private final Map<String, User> users;
     
-    public UserManager() {
+    public UserManager(PersistencyCommunicator communicator) {
+        super(communicator);
         users = new HashMap<>();
     }
     
