@@ -33,6 +33,13 @@ public class Picture {
         this.dislikes = 0;
     }
     
+    /**
+     * Create picture from params
+     * @param image Image
+     * @param date Date of upload
+     * @param likes No. of likes
+     * @param dislikes No. of dislikes
+     */
     public Picture(Image image, Date date, long likes, long dislikes) {
         this.image = image;
         this.date = date;
