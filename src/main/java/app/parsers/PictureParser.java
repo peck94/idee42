@@ -30,8 +30,11 @@ public class PictureParser extends Parser<Picture> {
     @Override
     public Picture fromJson(String json) {
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
+        
+        byte[] decoded = Base64.getDecoder().decode(object.get("data").getAsString());
+        
         Picture picture = new Picture(
-                object.get("data").getAsString().getBytes(),
+                decoded,
                 new Date(object.get("date").getAsString()),
                 object.get("likes").getAsLong(),
                 object.get("dislikes").getAsLong(),
