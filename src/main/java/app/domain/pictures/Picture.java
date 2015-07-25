@@ -1,5 +1,6 @@
 package app.domain.pictures;
 
+import app.domain.Observable;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -11,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Represents a picture somebody uploaded to the application.
  * @author jonathan
  */
-public class Picture {
+public class Picture extends Observable {
     // store the actual image
     private final byte[] image;
     // store time of upload
@@ -29,6 +30,7 @@ public class Picture {
      * @throws IOException 
      */
     public Picture(MultipartFile file) throws IOException {
+        super();
         this.image = file.getBytes();
         this.date = new Date();
         this.likes = 0;
@@ -79,11 +81,21 @@ public class Picture {
         return id;
     }
     
+    /**
+     * Cast a like for this picture.
+     * Invalidates the model.
+     */
     public void like() {
         likes++;
+        invalidate();
     }
     
+    /**
+     * Cast a dislike for this picture.
+     * Invalidates the model.
+     */
     public void dislike() {
         dislikes++;
+        invalidate();
     }
 }

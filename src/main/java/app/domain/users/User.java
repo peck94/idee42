@@ -1,18 +1,22 @@
 package app.domain.users;
 
+import app.domain.Observable;
 import app.domain.utils.HashedString;
 
 /**
  * Represents a user of the application.
  * Users contain the following information:
  * <ul>
+ * <li>id</li>
  * <li>username</li>
  * <li>password</li>
  * <li>e-mail address</li>
  * </ul>
  * @author jonathan
  */
-public class User {
+public class User extends Observable {
+    // store id
+    private final long id;
     // store username
     private final String username;
     // store password
@@ -22,14 +26,21 @@ public class User {
     
     /**
      * Create a user
+     * @param id ID of user
      * @param username Username
      * @param password Password
      * @param email E-mail address
      */
-    public User(String username, HashedString password, Email email) {
+    public User(long id, String username, HashedString password, Email email) {
+        super();
+        this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
+    }
+    
+    public long getId() {
+        return id;
     }
     
     public String getUsername() {

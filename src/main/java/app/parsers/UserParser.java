@@ -15,6 +15,7 @@ public class UserParser extends Parser<User> {
     @Override
     public String toJson(User user) {
         JsonObject object = new JsonObject();
+        object.addProperty("id", user.getId());
         object.addProperty("username", user.getUsername());
         object.addProperty("password", user.getPassword().toString());
         object.addProperty("email", user.getEmail().toString());
@@ -27,7 +28,9 @@ public class UserParser extends Parser<User> {
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
         
         try{
-            User user = new User(object.get("username").getAsString(),
+            User user = new User(
+                object.get("id").getAsLong(),
+                object.get("username").getAsString(),
                 new HashedString(object.get("password").getAsString(), false),
                 new Email(object.get("email").getAsString()));
             
