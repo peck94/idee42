@@ -1,13 +1,10 @@
 package app.domain.pictures;
 
-import java.awt.Image;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
-import javax.imageio.ImageIO;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -16,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public class Picture {
     // store the actual image
-    private final Image image;
+    private final byte[] image;
     // store time of upload
     private final Date date;
     // store number of likes
@@ -32,7 +29,7 @@ public class Picture {
      * @throws IOException 
      */
     public Picture(MultipartFile file) throws IOException {
-        this.image = ImageIO.read(new ByteArrayInputStream(file.getBytes()));
+        this.image = file.getBytes();
         this.date = new Date();
         this.likes = 0;
         this.dislikes = 0;
@@ -54,7 +51,7 @@ public class Picture {
      * @param dislikes No. of dislikes
      * @param id ID
      */
-    public Picture(Image image, Date date, long likes, long dislikes, BigInteger id) {
+    public Picture(byte[] image, Date date, long likes, long dislikes, BigInteger id) {
         this.image = image;
         this.date = date;
         this.likes = likes;
@@ -62,7 +59,7 @@ public class Picture {
         this.id = id;
     }
     
-    public Image getImage() {
+    public byte[] getImage() {
         return image;
     }
     
