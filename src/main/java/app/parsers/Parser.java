@@ -4,6 +4,8 @@ import java.util.Collection;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Interface for parsers.
@@ -30,7 +32,7 @@ public abstract class Parser<T> {
      * @param objects Collection to convert
      * @return JSON encoding of collection
      */
-    public String toJson(Collection<T> objects) {
+    public String toJsonArray(Collection<T> objects) {
         JsonParser parser = new JsonParser();
         JsonArray results = new JsonArray();
         for(T object: objects) {
@@ -39,5 +41,21 @@ public abstract class Parser<T> {
         }
         
         return results.toString();
+    }
+    
+    /**
+     * Convert a JSON array to objects.
+     * @param json JSON array
+     * @return Collection of objects
+     */
+    public Collection<T> fromJsonArray(String json) {
+        List<T> results = new ArrayList<>();
+        JsonArray array = new JsonParser().parse(json).getAsJsonArray();
+        for(JsonElement element: array) {
+            T object = fromJson(element.toString());
+            results.add(object);
+        }
+        
+        return results;
     }
 }

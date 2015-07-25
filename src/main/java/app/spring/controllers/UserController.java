@@ -54,6 +54,6 @@ public class UserController {
      */
     @RequestMapping(method=GET)
     public String list() {
-        return parser.toJson(userManager.getUsers());
+        return parser.toJsonArray(userManager.getUsers());
     }
 }
