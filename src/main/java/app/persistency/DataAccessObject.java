@@ -27,11 +27,10 @@ public interface DataAccessObject<T, K> {
     
     /**
      * Update an existing object
-     * @param id ID of object to update
      * @param newObject Model of object with new data
      * @throws app.exceptions.PersistencyException
      */
-    void update(K id, T newObject) throws PersistencyException;
+    void update(T newObject) throws PersistencyException;
     
     /**
      * Delete an object from persistency.

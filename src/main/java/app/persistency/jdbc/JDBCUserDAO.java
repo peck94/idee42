@@ -74,11 +74,11 @@ public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
     }
 
     @Override
-    public void update(Long id, User newObject) throws PersistencyException {
+    public void update(User newObject) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(UPDATE)) {
             s.setString(1, newObject.getPassword().toString());
             s.setString(2, newObject.getEmail().toString());
-            s.setLong(3, id);
+            s.setLong(3, newObject.getId());
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);

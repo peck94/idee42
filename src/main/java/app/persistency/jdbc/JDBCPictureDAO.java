@@ -83,11 +83,11 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     }
 
     @Override
-    public void update(BigInteger id, Picture newObject) throws PersistencyException {
+    public void update(Picture newObject) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(UPDATE)) {
             s.setLong(1, newObject.getLikes());
             s.setLong(2, newObject.getDislikes());
-            s.setString(3, id.toString());
+            s.setString(3, newObject.getId().toString());
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);
