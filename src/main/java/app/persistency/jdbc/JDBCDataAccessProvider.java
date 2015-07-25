@@ -1,6 +1,5 @@
 package app.persistency.jdbc;
 
-import app.persistency.DataAccessContext;
 import app.persistency.DataAccessProvider;
 import app.persistency.PictureDAO;
 import app.persistency.UserDAO;
