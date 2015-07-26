@@ -1,6 +1,7 @@
 package app.parsers;
 
 import app.domain.pictures.Picture;
+import app.domain.users.User;
 import app.domain.utils.DateConverter;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
@@ -49,7 +50,7 @@ public class PictureParserTest {
         
         String data = "yolo";
         String encoded = new String(Base64.getEncoder().encode(data.getBytes()));
-        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE);
+        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(0));
         String json = parser.toJson(picture);
         
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();

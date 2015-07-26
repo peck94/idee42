@@ -6,9 +6,15 @@
 package app.controllers;
 
 import app.domain.pictures.Picture;
-import app.domain.pictures.UserPicturesAssociation;
+import app.domain.users.Email;
 import app.domain.users.User;
+import app.domain.utils.HashedString;
+import app.persistency.DummyPersistencyCommunicator;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigInteger;
+import java.util.Date;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -47,13 +53,15 @@ public class PictureManagerTest {
      */
     @Test
     public void testAddEntry() throws Exception {
-        System.out.println("addEntry");
-        User user = null;
-        Picture picture = null;
-        PictureManager instance = null;
-        instance.addEntry(user, picture);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        
+        uman.addUser(user);
+        pman.addEntry(picture);
     }
 
     /**
@@ -61,14 +69,17 @@ public class PictureManagerTest {
      */
     @Test
     public void testGetPictures() throws Exception {
-        System.out.println("getPictures");
-        String username = "";
-        PictureManager instance = null;
-        UserPicturesAssociation expResult = null;
-        UserPicturesAssociation result = instance.getPictures(username);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        
+        uman.addUser(user);
+        pman.addEntry(picture);
+        
+        assertEquals(pman.getPictures(user.getUsername()).getTarget().size(), 1);
     }
 
     /**
@@ -76,14 +87,25 @@ public class PictureManagerTest {
      */
     @Test
     public void testGetRandomPicture() throws Exception {
-        System.out.println("getRandomPicture");
-        User exclude = null;
-        PictureManager instance = null;
-        Picture expResult = null;
-        Picture result = instance.getRandomPicture(exclude);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user1 = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        User user2 = new User(1, "shithead2", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1);
+        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2);
+        
+        uman.addUser(user1);
+        uman.addUser(user2);
+        pman.addEntry(picture1);
+        pman.addEntry(picture2);
+        
+        Picture p1 = pman.getRandomPicture(user1);
+        Picture p2 = pman.getRandomPicture(user2);
+        assertEquals(p1, picture1);
+        assertEquals(p2, picture2);
     }
 
     /**
@@ -91,13 +113,58 @@ public class PictureManagerTest {
      */
     @Test
     public void testUpload() throws Exception {
-        System.out.println("upload");
-        User user = null;
-        MultipartFile file = null;
-        PictureManager instance = null;
-        instance.upload(user, file);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        
+        uman.addUser(user);
+        pman.upload(user, new MultipartFile() {
+
+            @Override
+            public String getName() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public String getContentType() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public boolean isEmpty() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public long getSize() {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return "fuck".getBytes();
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+
+            @Override
+            public void transferTo(File file) throws IOException, IllegalStateException {
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+        
+        assertEquals(pman.getPictures(user.getUsername()).getTarget().size(), 1);
     }
 
     /**
@@ -105,12 +172,20 @@ public class PictureManagerTest {
      */
     @Test
     public void testLikePicture() throws Exception {
-        System.out.println("likePicture");
-        BigInteger id = null;
-        PictureManager instance = null;
-        instance.likePicture(id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        int likes = 10;
+        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user);
+        
+        uman.addUser(user);
+        pman.addEntry(picture);
+        pman.likePicture(picture.getId());
+        
+        Picture p2 = pman.getPictures(user.getUsername()).getTarget().get(0);
+        assertEquals(p2.getLikes(), likes+1);
     }
 
     /**
@@ -118,12 +193,20 @@ public class PictureManagerTest {
      */
     @Test
     public void testDislikePicture() throws Exception {
-        System.out.println("dislikePicture");
-        BigInteger id = null;
-        PictureManager instance = null;
-        instance.dislikePicture(id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        int dislikes = 5;
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user);
+        
+        uman.addUser(user);
+        pman.addEntry(picture);
+        pman.dislikePicture(picture.getId());
+        
+        Picture p2 = pman.getPictures(user.getUsername()).getTarget().get(0);
+        assertEquals(p2.getDislikes(), dislikes+1);
     }
     
 }

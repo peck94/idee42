@@ -1,6 +1,7 @@
 package app.parsers;
 
 import app.domain.pictures.Picture;
+import app.domain.users.User;
 import app.domain.utils.DateConverter;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -24,6 +25,7 @@ public class PictureParser extends Parser<Picture> {
         json.addProperty("likes", object.getLikes());
         json.addProperty("dislikes", object.getDislikes());
         json.addProperty("date", DateConverter.fromDate(object.getDate()));
+        json.addProperty("owner", object.getOwner().getId());
         
         return json.toString();
     }
@@ -39,7 +41,8 @@ public class PictureParser extends Parser<Picture> {
                 DateConverter.toDate(object.get("date").getAsString()),
                 object.get("likes").getAsLong(),
                 object.get("dislikes").getAsLong(),
-                new BigInteger(object.get("id").getAsString())
+                new BigInteger(object.get("id").getAsString()),
+                new User(object.get("owner").getAsLong())
         );
         
         return picture;

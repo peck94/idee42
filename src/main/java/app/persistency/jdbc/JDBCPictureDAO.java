@@ -1,6 +1,7 @@
 package app.persistency.jdbc;
 
 import app.domain.pictures.Picture;
+import app.domain.users.User;
 import app.domain.utils.DateConverter;
 import app.exceptions.PersistencyException;
 import app.persistency.PictureDAO;
@@ -20,8 +21,8 @@ import java.util.List;
  * @author jonathan
  */
 public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
-    private final String CREATE = "INSERT INTO pictures (id, image, date, likes, dislikes) VALUES (?, ?, ?, ?, ?)";
-    private final String GET = "SELECT id, image, date, likes, dislikes FROM pictures WHERE id = ?";
+    private final String CREATE = "INSERT INTO pictures (id, image, date, likes, dislikes, owner) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String GET = "SELECT id, image, date, likes, dislikes, owner FROM pictures WHERE id = ?";
     private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM pictures WHERE id = ? LIMIT 1";
     private final String LIST = "SELECT * FROM pictures";
@@ -45,7 +46,8 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
                 DateConverter.toDate(rs.getString(3)),
                 rs.getLong(4),
                 rs.getLong(5),
-                new BigInteger(rs.getString(1))
+                new BigInteger(rs.getString(1)),
+                new User(rs.getLong(6))
         );
         
         return picture;
@@ -61,6 +63,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             s.setString(3, DateConverter.fromDate(object.getDate()));
             s.setLong(4, object.getLikes());
             s.setLong(5, object.getDislikes());
+            s.setLong(6, object.getOwner().getId());
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);

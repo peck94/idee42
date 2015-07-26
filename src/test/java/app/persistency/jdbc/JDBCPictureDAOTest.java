@@ -6,6 +6,7 @@
 package app.persistency.jdbc;
 
 import app.domain.pictures.Picture;
+import app.domain.users.User;
 import app.persistency.DataAccessProvider;
 import app.persistency.PictureDAO;
 import java.math.BigInteger;
@@ -73,7 +74,7 @@ public class JDBCPictureDAOTest {
             BigInteger id = new BigInteger("" + i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, 2*i, i*i, id);
+                    d, 2*i, i*i, id, new User(0));
             dao.create(picture);
             
             Picture picture2 = dao.get(id);
@@ -92,7 +93,7 @@ public class JDBCPictureDAOTest {
             BigInteger id = new BigInteger("" + i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, i*i, 2*i, id);
+                    d, i*i, 2*i, id, new User(0));
             dao.update(picture);
             
             Picture picture2 = dao.get(id);

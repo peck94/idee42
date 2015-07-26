@@ -1,6 +1,7 @@
 package app.domain.pictures;
 
 import app.domain.Observable;
+import app.domain.users.User;
 import app.exceptions.DomainException;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -26,18 +27,21 @@ public class Picture extends Observable {
     private long dislikes;
     // store unique id
     private BigInteger id;
+    // store owner
+    private final User owner;
     
     /**
      * Create picture from file
      * @param file File to create image from
      * @throws IOException 
      */
-    public Picture(MultipartFile file) throws IOException {
+    public Picture(MultipartFile file, User owner) throws IOException {
         super();
         this.image = file.getBytes();
         this.date = new Date();
         this.likes = 0;
         this.dislikes = 0;
+        this.owner = owner;
         
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
@@ -55,13 +59,15 @@ public class Picture extends Observable {
      * @param likes No. of likes
      * @param dislikes No. of dislikes
      * @param id ID
+     * @param owner Owner of picture
      */
-    public Picture(byte[] image, Date date, long likes, long dislikes, BigInteger id) {
+    public Picture(byte[] image, Date date, long likes, long dislikes, BigInteger id, User owner) {
         this.image = image;
         this.date = date;
         this.likes = likes;
         this.dislikes = dislikes;
         this.id = id;
+        this.owner = owner;
     }
     
     public byte[] getImage() {
@@ -82,6 +88,10 @@ public class Picture extends Observable {
     
     public BigInteger getId() {
         return id;
+    }
+    
+    public User getOwner() {
+        return owner;
     }
     
     /**
@@ -115,7 +125,8 @@ public class Picture extends Observable {
                 p.getDate().equals(getDate()) &&
                 p.getLikes() == getLikes() &&
                 p.getDislikes() == getDislikes() &&
-                Arrays.equals(p.getImage(), getImage());
+                Arrays.equals(p.getImage(), getImage()) &&
+                p.getOwner().equals(getOwner());
     }
 
     @Override

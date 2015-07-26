@@ -8,6 +8,7 @@ import app.exceptions.ControllerException;
 import app.exceptions.DomainException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,15 @@ public class PictureManager extends Controller {
     
     /**
      * Add an entry to the map
-     * @param user Owner of the picture
      * @param picture Picture to add
      * @throws app.exceptions.ControllerException
      */
-    public void addEntry(User user, Picture picture) throws ControllerException {
+    public void addEntry(Picture picture) throws ControllerException {
+        User user = picture.getOwner();
+        if(!userManager.exists(user.getUsername())) {
+            throw new ControllerException("Unknown user: " + user.getUsername());
+        }
+        
         if(pictures.containsKey(picture.getId())) {
             throw new ControllerException("Duplicate picture: " + picture.getId());
         }
@@ -97,17 +102,13 @@ public class PictureManager extends Controller {
             throw new ControllerException("Not enough users for random picture");
         }
         
-        User selected;
+        List<Picture> pics = new ArrayList<>(pictures.values());
+        Picture pic;
         do{
-            int index = rng.nextInt(users.size());
-            selected = users.get(index);
-        }while(selected.getUsername().equals(exclude.getUsername()));
+            pic = pics.get(rng.nextInt(pics.size()));
+        }while(pic.getOwner().equals(exclude));
         
-        UserPicturesAssociation assoc = assocs.get(selected.getUsername());
-        List<Picture> pics = assoc.getTarget();
-        int index = rng.nextInt(pics.size());
-        
-        return pics.get(index);
+        return pic;
     }
     
     /**
@@ -118,8 +119,8 @@ public class PictureManager extends Controller {
      * @throws app.exceptions.ControllerException 
      */
     public void upload(User user, MultipartFile file) throws IOException, ControllerException {
-        Picture picture = new Picture(file);
-        addEntry(user, picture);
+        Picture picture = new Picture(file, user);
+        addEntry(picture);
     }
     
     /**

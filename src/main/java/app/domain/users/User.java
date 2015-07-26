@@ -40,6 +40,14 @@ public class User extends Observable {
         this.email = email;
     }
     
+    public User(long id) {
+        super();
+        this.id = id;
+        this.username = "";
+        this.password = null;
+        this.email = null;
+    }
+    
     public long getId() {
         return id;
     }
