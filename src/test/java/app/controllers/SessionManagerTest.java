@@ -104,7 +104,8 @@ public class SessionManagerTest {
     @Test
     public void testGetUser() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, 5);
+        long timeout = 5;
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, timeout);
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
@@ -112,6 +113,9 @@ public class SessionManagerTest {
         uman.addUser(user);
         SessionKey key = sman.login(user.getUsername(), password);
         assertEquals(sman.getUser(key), user);
+        
+        Thread.sleep(2*timeout);
+        assertFalse(sman.isLoggedIn(key));
     }
     
 }
