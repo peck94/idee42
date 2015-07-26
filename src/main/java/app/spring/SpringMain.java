@@ -4,6 +4,8 @@ import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
 import app.domain.PersistencyCommunicator;
+import app.domain.pictures.Picture;
+import app.domain.users.User;
 import app.persistency.DataAccessProvider;
 import app.persistency.jdbc.JDBCDataAccessContext;
 import app.persistency.jdbc.JDBCDataAccessProvider;
@@ -46,6 +48,16 @@ public class SpringMain {
         _userManager = new UserManager(communicator);
         _sessionManager = new SessionManager(communicator, _userManager, timeout);
         _pictureManager = new PictureManager(communicator, _userManager);
+        
+        // load all users
+        for(User user: dap.getUserDAO().getAll()) {
+            _userManager.addUser(user);
+        }
+        
+        // load all pictures
+        for(Picture picture: dap.getPictureDAO().getAll()) {
+            _pictureManager.addEntry(picture);
+        }
     }
     
     @Bean

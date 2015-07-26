@@ -35,7 +35,7 @@ public class UserManager extends Controller {
         
         throw new ControllerException("Unknown user: " + username);
     }
-    
+
     /**
      * Add a user to the repository
      * @param user User to add
