@@ -5,7 +5,12 @@
  */
 package app.controllers;
 
+import app.domain.users.Email;
 import app.domain.users.User;
+import app.domain.utils.HashedString;
+import app.exceptions.ControllerException;
+import app.persistency.DummyPersistencyCommunicator;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -42,16 +47,10 @@ public class UserManagerTest {
     /**
      * Test of getUser method, of class UserManager.
      */
-    @Test
-    public void testGetUser() throws Exception {
-        System.out.println("getUser");
-        String username = "";
-        UserManager instance = null;
-        User expResult = null;
-        User result = instance.getUser(username);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    @Test(expected=ControllerException.class)
+    public void testGetUser() throws ControllerException {
+        UserManager man = new UserManager(new DummyPersistencyCommunicator());
+        man.getUser("shithead");
     }
 
     /**
@@ -59,41 +58,42 @@ public class UserManagerTest {
      */
     @Test
     public void testAddUser() throws Exception {
-        System.out.println("addUser");
-        User user = null;
-        UserManager instance = null;
-        instance.addUser(user);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserManager man = new UserManager(new DummyPersistencyCommunicator());
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                new Email("shit@fuck.com"));
+        man.addUser(user);
+        
+        assertEquals(user, man.getUser(user.getUsername()));
     }
 
     /**
      * Test of exists method, of class UserManager.
      */
     @Test
-    public void testExists() {
-        System.out.println("exists");
-        String username = "";
-        UserManager instance = null;
-        boolean expResult = false;
-        boolean result = instance.exists(username);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testExists() throws NoSuchAlgorithmException, ControllerException {
+        UserManager man = new UserManager(new DummyPersistencyCommunicator());
+        User user = new User(0, "shithead", new HashedString("shit", false),
+                new Email("shit@fuck.com"));
+        man.addUser(user);
+        
+        assertTrue(man.exists(user.getUsername()));
+        assertFalse(man.exists("fuckwad"));
     }
 
     /**
      * Test of getUsers method, of class UserManager.
      */
     @Test
-    public void testGetUsers() {
-        System.out.println("getUsers");
-        UserManager instance = null;
-        List<User> expResult = null;
-        List<User> result = instance.getUsers();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testGetUsers() throws NoSuchAlgorithmException, ControllerException {
+        UserManager man = new UserManager(new DummyPersistencyCommunicator());
+        int count = 1000;
+        for(int i = 0; i < count; i++) {
+            User user = new User(0, "shithead" + i, new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+            man.addUser(user);
+        }
+        
+        assertEquals(man.getUsers().size(), count);
     }
     
 }
