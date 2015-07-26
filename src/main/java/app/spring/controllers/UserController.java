@@ -4,6 +4,7 @@ import app.controllers.UserManager;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
+import app.parsers.NewUserParser;
 import app.parsers.UserParser;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
@@ -27,7 +28,7 @@ public class UserController {
     private UserManager userManager;
     
     public UserController() {
-        parser = new UserParser();
+        parser = new NewUserParser();
     }
     
     /**
