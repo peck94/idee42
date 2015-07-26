@@ -39,6 +39,8 @@ public class SessionManager extends Controller {
     // store sessions
     private final LinkedList<Session> sessions;
     private final Map<SessionKey, Session> keys;
+    // store user manager
+    private final UserManager userManager;
     // store timeout value
     private final long timeout;
     // store rng
@@ -77,26 +79,29 @@ public class SessionManager extends Controller {
     /**
      * Create a new session manager
      * @param communicator
+     * @param userManager User Manager
      * @param timeout Timeout value for session expiration
      */
-    public SessionManager(PersistencyCommunicator communicator, long timeout) {
+    public SessionManager(PersistencyCommunicator communicator, UserManager userManager, long timeout) {
         super(communicator);
         sessions = new LinkedList<>();
         keys = new HashMap<>();
         rng = new SecureRandom();
         this.timeout = timeout;
+        this.userManager = userManager;
     }
     
     /**
      * Login a user
-     * @param user User to login
+     * @param username Username
      * @param password Plaintext password
      * @return Session key for user 
      * @throws app.exceptions.ControllerException 
      */
-    public SessionKey login(User user, String password) throws ControllerException {
+    public SessionKey login(String username, String password) throws ControllerException {
         try {
             HashedString hashedPassword = new HashedString(password, false);
+            User user = userManager.getUser(username);
             if(user.getPassword().equals(hashedPassword)) {
                 SessionKey key;
                 do{
@@ -117,17 +122,16 @@ public class SessionManager extends Controller {
                 throw new ControllerException("Invalid credentials for " + user.getUsername());
             }
         }catch(NoSuchAlgorithmException e) {
-            throw new ControllerException("Password can't be hashed");
+            throw new ControllerException(e);
         }
     }
     
     /**
      * Logout a user
-     * @param auth Auth string
+     * @param key Auth key
      * @throws app.exceptions.ControllerException
      */
-    public void logout(String auth) throws ControllerException {
-        SessionKey key = new SessionKey(auth);
+    public void logout(SessionKey key) throws ControllerException {
         if(!keys.containsKey(key)) {
             throw new ControllerException("Invalid key");
         }
@@ -143,22 +147,21 @@ public class SessionManager extends Controller {
      * @param key Key to verify
      * @return Whether or not the key corresponds to an existing session
      */
-    public boolean isLoggedIn(String key) {
-        return keys.containsKey(new SessionKey(key));
+    public boolean isLoggedIn(SessionKey key) {
+        return keys.containsKey(key);
     }
     
     /**
      * Get user by session key
-     * @param auth Session key
+     * @param key Session key
      * @return User of key
      * @throws app.exceptions.ControllerException
      */
-    public User getUser(String auth) throws ControllerException {
-        SessionKey key = new SessionKey(auth);
+    public User getUser(SessionKey key) throws ControllerException {
         if(keys.containsKey(key)) {
             return keys.get(key).getUser();
         }else{
-            throw new ControllerException("User not logged in: " + auth);
+            throw new ControllerException("User not logged in: " + key);
         }
     }
 }

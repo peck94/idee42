@@ -22,7 +22,6 @@ import static org.junit.Assert.*;
  * @author jonathan
  */
 public class SessionManagerTest {
-    
     public SessionManagerTest() {
     }
     
@@ -47,16 +46,18 @@ public class SessionManagerTest {
      */
     @Test
     public void testLogin() throws Exception {
-        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, 5);
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
         
-        assertNotNull(sman.login(user, password));
+        uman.addUser(user);
+        assertNotNull(sman.login(user.getUsername(), password));
         
         boolean ok = false;
         try{
-            sman.login(user, "kak");
+            sman.login(user.getUsername(), "kak");
         }catch(Exception e) {
             ok = true;
         }
@@ -68,15 +69,17 @@ public class SessionManagerTest {
      */
     @Test
     public void testLogout() throws Exception {
-        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, 5);
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
         
-        SessionKey key = sman.login(user, password);
-        sman.logout(key.toString());
+        uman.addUser(user);
+        SessionKey key = sman.login(user.getUsername(), password);
+        sman.logout(key);
         
-        assertFalse(sman.isLoggedIn(key.toString()));
+        assertFalse(sman.isLoggedIn(key));
     }
 
     /**
@@ -84,13 +87,15 @@ public class SessionManagerTest {
      */
     @Test
     public void testIsLoggedIn() throws Exception {
-        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, 5);
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
         
-        SessionKey key = sman.login(user, password);
-        assertTrue(sman.isLoggedIn(key.toString()));
+        uman.addUser(user);
+        SessionKey key = sman.login(user.getUsername(), password);
+        assertTrue(sman.isLoggedIn(key));
     }
 
     /**
@@ -98,13 +103,15 @@ public class SessionManagerTest {
      */
     @Test
     public void testGetUser() throws Exception {
-        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), uman, 5);
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
         
-        SessionKey key = sman.login(user, password);
-        assertEquals(sman.getUser(key.toString()), user);
+        uman.addUser(user);
+        SessionKey key = sman.login(user.getUsername(), password);
+        assertEquals(sman.getUser(key), user);
     }
     
 }

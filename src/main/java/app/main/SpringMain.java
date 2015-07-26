@@ -44,7 +44,7 @@ public class SpringMain {
         // init controllers
         long timeout = Long.parseLong(config.getProperty("sessions.timeout"));
         _userManager = new UserManager(communicator);
-        _sessionManager = new SessionManager(communicator, timeout);
+        _sessionManager = new SessionManager(communicator, _userManager, timeout);
         _pictureManager = new PictureManager(communicator, _userManager);
     }
     

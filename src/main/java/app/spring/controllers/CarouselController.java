@@ -3,6 +3,7 @@ package app.spring.controllers;
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;
 import app.domain.pictures.Picture;
+import app.domain.users.SessionKey;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
@@ -40,9 +41,10 @@ public class CarouselController {
     @RequestMapping(method=GET)
     public String random(
         @RequestHeader(value="auth") String auth) throws SpringException {
-        if(sessionManager.isLoggedIn(auth)) {
+        SessionKey key = new SessionKey(auth);
+        if(sessionManager.isLoggedIn(key)) {
             try{
-                User user = sessionManager.getUser(auth);
+                User user = sessionManager.getUser(key);
                 Picture picture = pictureManager.getRandomPicture(user);
                 
                 return parser.toJson(picture);

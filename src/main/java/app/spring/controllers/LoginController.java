@@ -3,7 +3,6 @@ package app.spring.controllers;
 import app.controllers.SessionManager;
 import app.controllers.UserManager;
 import app.domain.users.SessionKey;
-import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
 import app.spring.messages.Message;
@@ -39,8 +38,7 @@ public class LoginController {
             @RequestParam(value="password") String password)
         throws SpringException{
         try{
-            User user = userManager.getUser(username);
-            SessionKey key = sessionManager.login(user, password);
+            SessionKey key = sessionManager.login(username, password);
             
             return key.toString();
         }catch(Exception e) {
@@ -58,7 +56,7 @@ public class LoginController {
     public Message logout(
         @RequestHeader(value="auth") String auth) throws SpringException {
         try{
-            sessionManager.logout(auth);
+            sessionManager.logout(new SessionKey(auth));
         
             return new OkMessage();
         }catch(ControllerException ex) {
