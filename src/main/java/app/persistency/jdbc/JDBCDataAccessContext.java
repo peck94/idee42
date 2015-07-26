@@ -27,8 +27,9 @@ public class JDBCDataAccessContext implements DataAccessContext {
             String username,
             String password,
             String db) throws ClassNotFoundException, SQLException {
+        // load driver
         Class.forName("com.mysql.jdbc.Driver");
-        
+        // create connection
         conn = DriverManager.getConnection("jdbc:mysql://" + host + "/" + db,
                 username, password);
     }

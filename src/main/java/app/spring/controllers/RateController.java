@@ -12,10 +12,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Handles liking and disliking of pictures.
+ * TODO:
+ * <ul>
+ * <li>only logged-in users can rate pictures</li>
+ * <li>users can't rate their own pictures</li>
+ * <li>users can only rate a picture once</li>
+ * </ul>
  * @author jonathan
  */
 @RestController
 public class RateController {
+    // store picture manager
     @Autowired
     private PictureManager pictureManager;
     
@@ -27,6 +34,7 @@ public class RateController {
     @RequestMapping(value="/api/like", method=POST)
     public void like(
         @RequestParam(value="id") String id) throws SpringException {
+        // attempt to like the picture
         BigInteger pic = new BigInteger(id);
         
         try{
@@ -44,6 +52,7 @@ public class RateController {
     @RequestMapping(value="/api/dislike", method=POST)
     public void dislike(
         @RequestParam(value="id") String id) throws SpringException {
+        // attempt to dislike the picture
         BigInteger pic = new BigInteger(id);
         
         try{

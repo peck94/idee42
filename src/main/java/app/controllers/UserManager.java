@@ -29,10 +29,12 @@ public class UserManager extends Controller {
      * @throws app.exceptions.ControllerException
      */
     public User getUser(String username) throws ControllerException {
+        // check whether the user exists
         if(users.containsKey(username)) {
             return users.get(username);
         }
         
+        // nope
         throw new ControllerException("Unknown user: " + username);
     }
 
@@ -42,8 +44,11 @@ public class UserManager extends Controller {
      * @throws app.exceptions.ControllerException
      */
     public void addUser(User user) throws ControllerException {
+        // check whether the user exists
         if(!users.containsKey(user.getUsername())) {
+            // add to repo
             users.put(user.getUsername(), user);
+            // notify persistency
             try{
                 getCommunicator().registerUser(user);
             }catch(DomainException e) {
@@ -64,6 +69,7 @@ public class UserManager extends Controller {
     }
 
     public List<User> getUsers() {
+        // don't leak references
         return new ArrayList<>(users.values());
     }
 }

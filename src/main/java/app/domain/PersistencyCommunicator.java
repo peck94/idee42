@@ -37,7 +37,9 @@ public class PersistencyCommunicator {
      * @throws app.exceptions.DomainException
      */
     public void registerPicture(Picture picture) throws DomainException {
+        // attach listener to the picture
         picture.addListener(pictureListener);
+        // update for good measure
         pictureListener.update(picture);
     }
     
@@ -47,7 +49,9 @@ public class PersistencyCommunicator {
      * @throws app.exceptions.DomainException
      */
     public void registerUser(User user) throws DomainException {
+        // attach listener to user
         user.addListener(userListener);
+        // update for good measure
         userListener.update(user);
     }
 }

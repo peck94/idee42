@@ -23,11 +23,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value="/api/user")
 public class UserController {
+    // store parser
     private final UserParser parser;
+    // store user manager
     @Autowired
     private UserManager userManager;
     
     public UserController() {
+        // use NewUserParser because the ID won't be filled in
         parser = new NewUserParser();
     }
     
@@ -39,6 +42,7 @@ public class UserController {
      */
     @RequestMapping(method=POST)
     public Message create(@RequestBody String body) throws SpringException {
+        // attempt to create a new user
         try {
             User user = parser.fromJson(body);
             userManager.addUser(user);

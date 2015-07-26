@@ -41,6 +41,14 @@ public class User extends Observable {
         this.email = email;
     }
     
+    /**
+     * Create new user by ID only.
+     * This is useful for applications that only require the primary key.
+     * However, directly using the primary key type outside of the model and
+     * persistency is bad practice.
+     * @param id ID of user
+     * @throws NoSuchAlgorithmException 
+     */
     public User(long id) throws NoSuchAlgorithmException {
         super();
         this.id = id;

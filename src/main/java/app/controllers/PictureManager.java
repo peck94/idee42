@@ -48,23 +48,31 @@ public class PictureManager extends Controller {
      * @throws app.exceptions.ControllerException
      */
     public void addEntry(Picture picture) throws ControllerException {
+        // retrieve the owner of the picture
         User user = picture.getOwner();
+        // check whether this person exists
         if(!userManager.exists(user.getUsername())) {
             throw new ControllerException("Unknown user: " + user.getUsername());
         }
         
+        // check for duplicate pictures
         if(pictures.containsKey(picture.getId())) {
             throw new ControllerException("Duplicate picture: " + picture.getId());
         }
         
+        // check for existing association
         if(!assocs.containsKey(user.getUsername())) {
+            // you must be new here
             assocs.put(user.getUsername(),
                     new UserPicturesAssociation(user));
         }
         
+        // add picture to existing association
         assocs.get(user.getUsername()).addPicture(picture);
+        // put picture in repo
         pictures.put(picture.getId(), picture);
         
+        // try to update persistency
         try{
             getCommunicator().registerPicture(picture);
         }catch(DomainException e) {
@@ -80,10 +88,12 @@ public class PictureManager extends Controller {
      */
     public UserPicturesAssociation getPictures(String username)
         throws ControllerException {
+        // check whether we have this guy on record
         if(assocs.containsKey(username)) {
             return assocs.get(username);
         }
         
+        // apparently not
         throw new ControllerException("No pictures for user " + username);
     }
     
@@ -97,11 +107,13 @@ public class PictureManager extends Controller {
      * @throws app.exceptions.ControllerException If a random picture can't be retrieved
      */
     public Picture getRandomPicture(User exclude) throws ControllerException {
+        // prevent infinite loop
         List<User> users = userManager.getUsers();
         if(users.size() < 2) {
             throw new ControllerException("Not enough users for random picture");
         }
         
+        // choose a random picture not owned by excluded user
         List<Picture> pics = new ArrayList<>(pictures.values());
         Picture pic;
         do{
@@ -130,6 +142,7 @@ public class PictureManager extends Controller {
      * @throws ControllerException Picture not found
      */
     private Picture getPictureById(BigInteger id) throws ControllerException {
+        // fetch the picture from our repo
         if(pictures.containsKey(id)) {
             return pictures.get(id);
         }else{

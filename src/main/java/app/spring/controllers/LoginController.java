@@ -20,8 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 public class LoginController {
-    @Autowired
-    private UserManager userManager;
+    // store session manager
     @Autowired
     private SessionManager sessionManager;
     
@@ -38,8 +37,10 @@ public class LoginController {
             @RequestParam(value="password") String password)
         throws SpringException{
         try{
+            // attempt to login with these credentials
             SessionKey key = sessionManager.login(username, password);
             
+            // return the session key as a string
             return key.toString();
         }catch(Exception e) {
             throw new SpringException("Invalid credentials for " + username);
@@ -56,6 +57,7 @@ public class LoginController {
     public Message logout(
         @RequestHeader(value="auth") String auth) throws SpringException {
         try{
+            // attempt to logout
             sessionManager.logout(new SessionKey(auth));
         
             return new OkMessage();

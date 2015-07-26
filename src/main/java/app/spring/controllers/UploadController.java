@@ -24,8 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequestMapping(value="/api/upload")
 public class UploadController {
+    // store session manager
     @Autowired
     private SessionManager sessionManager;
+    // store picture manager
     @Autowired
     private PictureManager pictureManager;
     
@@ -40,8 +42,10 @@ public class UploadController {
     public Message upload(
         @RequestParam(value="file") MultipartFile file,
         @RequestHeader(value="auth") String auth) throws SpringException {
+        // verify that this user is logged in
         SessionKey key = new SessionKey(auth);
         if(sessionManager.isLoggedIn(key)) {
+            // attempt to upload this file
             try{
                 User user = sessionManager.getUser(key);
                 pictureManager.upload(user, file);

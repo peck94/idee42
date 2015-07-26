@@ -49,23 +49,40 @@ public class SessionManager extends Controller {
     private class Validator implements Runnable {
         @Override
         public void run() {
+            // store timeout (calculated later)
             long timeout = 0;
+            // as long as there are sessions
             while(sessions.size() > 0) {
+                // current time
                 Date d = new Date();
                 
+                // iterate over all sessions
                 Iterator<Session> itr = sessions.iterator();
                 while(itr.hasNext()) {
+                    // retrieve session
                     Session s = itr.next();
+                    // calculate period of inactivity
                     long diff = d.getTime() - s.getDate().getTime();
                     if(diff > SessionManager.this.timeout) {
+                        // timeout exceeded
                         keys.remove(s.getKey());
                         itr.remove();
                     }else{
+                        /*
+                        * Sessions are sorted from least to most recently active.
+                        * Therefore, we may set our waiting period to the last
+                        * session in this list that hasn't expired yet.
+                        */
                         timeout = diff;
                         break;
                     }
                 }
                 
+                /*
+                * Conserve resources by making this thread sleep for a while.
+                * The timeout is supposed to be the minimal waiting period during
+                * which no session could possibly expire.
+                */
                 try {
                     Thread.sleep(timeout);
                 } catch (InterruptedException ex) {
@@ -100,25 +117,36 @@ public class SessionManager extends Controller {
      */
     public SessionKey login(String username, String password) throws ControllerException {
         try {
+            // hash the plaintext password
             HashedString hashedPassword = new HashedString(password, false);
+            // get the user from the repo
             User user = userManager.getUser(username);
+            // compare password hashes
             if(user.getPassword().equals(hashedPassword)) {
+                // generate a new, secure random session key
                 SessionKey key;
                 do{
                     key = new SessionKey(rng);
                 }while(keys.containsKey(key));
 
+                // create and store the session
                 Session session = new Session(user, key);
                 sessions.add(session);
                 keys.put(key, session);
 
+                // if this is the first session
                 if(sessions.size() == 1) {
+                    // start validator thread to keep track of expirations
                     Thread t = new Thread(new Validator());
                     t.start();
                 }
 
                 return key;
             }else{
+                /*
+                * It is important not to leak information about what part of the
+                * login was incorrect, as this would facilitate brute-forcing.
+                */
                 throw new ControllerException("Invalid credentials for " + user.getUsername());
             }
         }catch(NoSuchAlgorithmException e) {
@@ -132,12 +160,13 @@ public class SessionManager extends Controller {
      * @throws app.exceptions.ControllerException
      */
     public void logout(SessionKey key) throws ControllerException {
+        // check whether the session actually exists
         if(!keys.containsKey(key)) {
             throw new ControllerException("Invalid key");
         }
         
+        // remove the key and session
         Session s = keys.get(key);
-        
         keys.remove(key);
         sessions.remove(s);
     }
@@ -158,6 +187,7 @@ public class SessionManager extends Controller {
      * @throws app.exceptions.ControllerException
      */
     public User getUser(SessionKey key) throws ControllerException {
+        // check whether the key exists
         if(keys.containsKey(key)) {
             return keys.get(key).getUser();
         }else{

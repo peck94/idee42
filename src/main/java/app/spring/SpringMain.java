@@ -19,11 +19,17 @@ import org.springframework.context.annotation.Bean;
  */
 @SpringBootApplication
 public class SpringMain {
+    // store controllers
     private final UserManager _userManager;
     private final SessionManager _sessionManager;
     private final PictureManager _pictureManager;
+    // store persistency communicator
     private final PersistencyCommunicator communicator;
     
+    /**
+     * This constructor initializes all parts of the application.
+     * @throws Exception 
+     */
     public SpringMain() throws Exception {
         // load config
         Properties config = new Properties();
@@ -48,6 +54,12 @@ public class SpringMain {
         _userManager = new UserManager(communicator);
         _sessionManager = new SessionManager(communicator, _userManager, timeout);
         _pictureManager = new PictureManager(communicator, _userManager);
+        
+        /**
+         * TODO: the below code is fine for now, but won't scale with many
+         * users. Find alternative to loading everything in at init time.
+         * Most obvious choice is some sort of caching mechanism.
+         */
         
         // load all users
         for(User user: dap.getUserDAO().getAll()) {

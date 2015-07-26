@@ -7,6 +7,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 /**
  * Server configuration class.
+ * This is mainly used for side-effects of Spring annotations.
  * @author jonathan
  */
 @Configuration

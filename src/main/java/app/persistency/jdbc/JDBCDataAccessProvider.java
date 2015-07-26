@@ -9,8 +9,10 @@ import app.persistency.UserDAO;
  * @author jonathan
  */
 public class JDBCDataAccessProvider implements DataAccessProvider {
+    // store DAOs
     private UserDAO userDAO;
     private PictureDAO pictureDAO;
+    // store DAC
     private final JDBCDataAccessContext dac;
     
     public JDBCDataAccessProvider(JDBCDataAccessContext dac) {

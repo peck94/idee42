@@ -18,9 +18,12 @@ public class HashedString {
      * @throws NoSuchAlgorithmException 
      */
     public HashedString(String input, boolean hashed) throws NoSuchAlgorithmException {
+        // if the string is hashed already
         if(hashed) {
+            // simply store it
             this.hashed = input;
         }else{
+            // else hash it now
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
             digest.update(input.getBytes());
             

@@ -22,10 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(value="/api/carousel")
 public class CarouselController {
+    // store session manager
     @Autowired
     private SessionManager sessionManager;
+    // store picture manager
     @Autowired
     private PictureManager pictureManager;
+    // store parser
     private final PictureParser parser;
     
     public CarouselController() {
@@ -41,8 +44,10 @@ public class CarouselController {
     @RequestMapping(method=GET)
     public String random(
         @RequestHeader(value="auth") String auth) throws SpringException {
+        // check whether this token belongs to a logged-in user
         SessionKey key = new SessionKey(auth);
         if(sessionManager.isLoggedIn(key)) {
+            // attempt to fetch a random picture
             try{
                 User user = sessionManager.getUser(key);
                 Picture picture = pictureManager.getRandomPicture(user);
