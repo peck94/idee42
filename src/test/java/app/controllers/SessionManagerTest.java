@@ -5,8 +5,11 @@
  */
 package app.controllers;
 
+import app.domain.users.Email;
 import app.domain.users.SessionKey;
 import app.domain.users.User;
+import app.domain.utils.HashedString;
+import app.persistency.DummyPersistencyCommunicator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -44,15 +47,20 @@ public class SessionManagerTest {
      */
     @Test
     public void testLogin() throws Exception {
-        System.out.println("login");
-        User user = null;
-        String password = "";
-        SessionManager instance = null;
-        SessionKey expResult = null;
-        SessionKey result = instance.login(user, password);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        String password = "shit";
+        User user = new User(0, "shithead", new HashedString(password, false),
+                    new Email("shit@fuck.com"));
+        
+        assertNotNull(sman.login(user, password));
+        
+        boolean ok = false;
+        try{
+            sman.login(user, "kak");
+        }catch(Exception e) {
+            ok = true;
+        }
+        assertTrue(ok);
     }
 
     /**
@@ -60,27 +68,29 @@ public class SessionManagerTest {
      */
     @Test
     public void testLogout() throws Exception {
-        System.out.println("logout");
-        String auth = "";
-        SessionManager instance = null;
-        instance.logout(auth);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        String password = "shit";
+        User user = new User(0, "shithead", new HashedString(password, false),
+                    new Email("shit@fuck.com"));
+        
+        SessionKey key = sman.login(user, password);
+        sman.logout(key.toString());
+        
+        assertFalse(sman.isLoggedIn(key.toString()));
     }
 
     /**
      * Test of isLoggedIn method, of class SessionManager.
      */
     @Test
-    public void testIsLoggedIn() {
-        System.out.println("isLoggedIn");
-        String key = "";
-        SessionManager instance = null;
-        boolean expResult = false;
-        boolean result = instance.isLoggedIn(key);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testIsLoggedIn() throws Exception {
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        String password = "shit";
+        User user = new User(0, "shithead", new HashedString(password, false),
+                    new Email("shit@fuck.com"));
+        
+        SessionKey key = sman.login(user, password);
+        assertTrue(sman.isLoggedIn(key.toString()));
     }
 
     /**
@@ -88,14 +98,13 @@ public class SessionManagerTest {
      */
     @Test
     public void testGetUser() throws Exception {
-        System.out.println("getUser");
-        String auth = "";
-        SessionManager instance = null;
-        User expResult = null;
-        User result = instance.getUser(auth);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        SessionManager sman = new SessionManager(new DummyPersistencyCommunicator(), 5);
+        String password = "shit";
+        User user = new User(0, "shithead", new HashedString(password, false),
+                    new Email("shit@fuck.com"));
+        
+        SessionKey key = sman.login(user, password);
+        assertEquals(sman.getUser(key.toString()), user);
     }
     
 }
