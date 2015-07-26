@@ -13,6 +13,7 @@ import app.persistency.PictureDAO;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import org.junit.After;
@@ -79,7 +80,7 @@ public class JDBCPictureDAOTest {
         for(int i = 0; i < COUNT; i++) {
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, 2*i, i*i, BigInteger.ZERO, new User(0));
+                    d, 2*i, i*i, BigInteger.ZERO, new User(0), new HashSet<>());
             BigInteger id = dao.create(picture);
             ids.add(id);
         }
@@ -96,7 +97,7 @@ public class JDBCPictureDAOTest {
             BigInteger id = ids.get(i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, i*i, 2*i, id, new User(0));
+                    d, i*i, 2*i, id, new User(0), new HashSet<>());
             dao.update(picture);
             
             Picture picture2 = dao.get(id);

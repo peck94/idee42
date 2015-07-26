@@ -9,7 +9,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -29,6 +31,8 @@ public class Picture extends Observable {
     private BigInteger id;
     // store owner
     private final User owner;
+    // store likers and dislikers
+    private Set<User> actors;
     
     /**
      * Create picture from file
@@ -42,6 +46,7 @@ public class Picture extends Observable {
         this.likes = 0;
         this.dislikes = 0;
         this.owner = owner;
+        this.actors = new HashSet<>();
         
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-512");
@@ -60,14 +65,17 @@ public class Picture extends Observable {
      * @param dislikes No. of dislikes
      * @param id ID
      * @param owner Owner of picture
+     * @param actors Users who liked or disliked the picture
      */
-    public Picture(byte[] image, Date date, long likes, long dislikes, BigInteger id, User owner) {
+    public Picture(byte[] image, Date date, long likes, long dislikes,
+            BigInteger id, User owner, Set<User> actors) {
         this.image = image;
         this.date = date;
         this.likes = likes;
         this.dislikes = dislikes;
         this.id = id;
         this.owner = owner;
+        this.actors = actors;
     }
     
     public byte[] getImage() {
@@ -94,23 +102,43 @@ public class Picture extends Observable {
         return owner;
     }
     
+    public Set<User> getActors() {
+        return new HashSet<>(actors);
+    }
+    
     /**
      * Cast a like for this picture.
      * Invalidates the model.
+     * @param user User who likes this picture
      * @throws app.exceptions.DomainException
      */
-    public void like() throws DomainException {
+    public void like(User user) throws DomainException {
+        // check whether this user has already liked/disliked
+        if(actors.contains(user)) {
+            throw new DomainException("One vote per user per picture!");
+        }
+        
+        // like the picture
         likes++;
+        actors.add(user);
         invalidate();
     }
     
     /**
      * Cast a dislike for this picture.
      * Invalidates the model.
+     * @param user User who dislikes this picture
      * @throws app.exceptions.DomainException
      */
-    public void dislike() throws DomainException {
+    public void dislike(User user) throws DomainException {
+        // check whether this user has already liked/disliked
+        if(actors.contains(user)) {
+            throw new DomainException("One vote per user per picture!");
+        }
+        
+        // dislike the picture
         dislikes++;
+        actors.add(user);
         invalidate();
     }
     
@@ -121,12 +149,7 @@ public class Picture extends Observable {
         }
         
         Picture p = (Picture) o;
-        return p.getId().equals(getId()) &&
-                p.getDate().equals(getDate()) &&
-                p.getLikes() == getLikes() &&
-                p.getDislikes() == getDislikes() &&
-                Arrays.equals(p.getImage(), getImage()) &&
-                p.getOwner().equals(getOwner());
+        return p.getId().equals(getId());
     }
 
     @Override

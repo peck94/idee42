@@ -152,12 +152,13 @@ public class PictureManager extends Controller {
     
     /**
      * Like a picture
+     * @param user User that dislikes the picture
      * @param id ID of picture to like
      * @throws app.exceptions.ControllerException
      */
-    public void likePicture(BigInteger id) throws ControllerException {
+    public void likePicture(User user, BigInteger id) throws ControllerException {
         try{
-            getPictureById(id).like();
+            getPictureById(id).like(user);
         }catch(DomainException e) {
             throw new ControllerException(e);
         }
@@ -165,12 +166,13 @@ public class PictureManager extends Controller {
     
     /**
      * Dislike a picture
+     * @param user User that dislikes the picture
      * @param id ID of picture to dislike
      * @throws app.exceptions.ControllerException
      */
-    public void dislikePicture(BigInteger id) throws ControllerException {
+    public void dislikePicture(User user, BigInteger id) throws ControllerException {
         try{
-            getPictureById(id).dislike();
+            getPictureById(id).dislike(user);
         }catch(DomainException e) {
             throw new ControllerException(e);
         }

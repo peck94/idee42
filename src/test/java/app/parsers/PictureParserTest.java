@@ -3,6 +3,7 @@ package app.parsers;
 import app.domain.pictures.Picture;
 import app.domain.users.User;
 import app.domain.utils.DateConverter;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import java.math.BigInteger;
@@ -10,6 +11,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashSet;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -52,7 +54,7 @@ public class PictureParserTest {
         long owner = 0;
         String data = "yolo";
         String encoded = new String(Base64.getEncoder().encode(data.getBytes()));
-        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner));
+        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner), new HashSet<>());
         String json = parser.toJson(picture);
         
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
@@ -83,6 +85,7 @@ public class PictureParserTest {
         object.addProperty("dislikes", dislikes);
         object.addProperty("date", DateConverter.fromDate(date));
         object.addProperty("owner", 0);
+        object.add("actors", new JsonArray());
         
         PictureParser parser = new PictureParser();
         Picture picture = parser.fromJson(object.toString());

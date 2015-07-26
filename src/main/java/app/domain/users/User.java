@@ -80,10 +80,7 @@ public class User extends Observable {
         }
         
         User u = (User) o;
-        return (u.getUsername().equals(getUsername()) &&
-                u.getPassword().equals(getPassword()) &&
-                u.getEmail().equals(getEmail()) &&
-                u.getId() == getId());
+        return u.getId() == getId();
     }
 
     @Override

@@ -13,16 +13,19 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.StringJoiner;
 
 /**
  * JDBC implementation for PictureDAO.
  * @author jonathan
  */
 public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
-    private final String CREATE = "INSERT INTO pictures (image, date, likes, dislikes, owner) VALUES (?, ?, ?, ?, ?)";
-    private final String GET = "SELECT id, image, date, likes, dislikes, owner FROM pictures WHERE id = ?";
-    private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ? WHERE id = ?";
+    private final String CREATE = "INSERT INTO pictures (image, date, likes, dislikes, owner, actors) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String GET = "SELECT id, image, date, likes, dislikes, owner, actors FROM pictures WHERE id = ?";
+    private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ?, actors = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM pictures WHERE id = ? LIMIT 1";
     private final String LIST = "SELECT * FROM pictures";
     private final String CLEAR = "DELETE FROM pictures";
@@ -40,6 +43,14 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
      */
     private Picture convert(ResultSet rs) throws PersistencyException {
         try{
+            Set<User> actors = new HashSet<>();
+            if(rs.getString(7).length() > 0) {
+                String[] elements = rs.getString(7).split(",");
+                for(String element: elements) {
+                    actors.add(new User(Long.parseLong(element)));
+                }
+            }
+            
             byte[] decoded = Base64.getDecoder().decode(rs.getString(2));
             Picture picture = new Picture(
                     decoded,
@@ -47,7 +58,8 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
                     rs.getLong(4),
                     rs.getLong(5),
                     new BigInteger(rs.getString(1)),
-                    new User(rs.getLong(6))
+                    new User(rs.getLong(6)),
+                    actors
             );
 
             return picture;
@@ -59,6 +71,10 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     @Override
     public BigInteger create(Picture object) throws PersistencyException {
         String encoded = new String(Base64.getEncoder().encode(object.getImage()));
+        StringJoiner actors = new StringJoiner(",");
+        for(User user: object.getActors()) {
+            actors.add(user.getId() + "");
+        }
         
         try(PreparedStatement s = getConnection().prepareStatement(CREATE,
                 new String[]{"id"})) {
@@ -67,6 +83,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             s.setLong(3, object.getLikes());
             s.setLong(4, object.getDislikes());
             s.setLong(5, object.getOwner().getId());
+            s.setString(6, actors.toString());
             s.executeUpdate();
             
             ResultSet rs = s.getGeneratedKeys();
@@ -96,9 +113,15 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     @Override
     public void update(Picture newObject) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(UPDATE)) {
+            StringJoiner actors = new StringJoiner(",");
+            for(User user: newObject.getActors()) {
+                actors.add(user.getId() + "");
+            }
+            
             s.setLong(1, newObject.getLikes());
             s.setLong(2, newObject.getDislikes());
-            s.setString(3, newObject.getId().toString());
+            s.setString(3, actors.toString());
+            s.setString(4, newObject.getId().toString());
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);

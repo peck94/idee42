@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.HashSet;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
         
         uman.addUser(user);
         pman.addEntry(picture);
@@ -74,7 +75,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
         
         uman.addUser(user);
         pman.addEntry(picture);
@@ -94,8 +95,8 @@ public class PictureManagerTest {
                     new Email("shit@fuck.com"));
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1);
-        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2);
+        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1, new HashSet<>());
+        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2, new HashSet<>());
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -118,7 +119,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
         
         uman.addUser(user);
         pman.upload(user, new MultipartFile() {
@@ -175,17 +176,21 @@ public class PictureManagerTest {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
         PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
         
-        User user = new User(0, "shithead", new HashedString("shit", false),
+        User user1 = new User(0, "shithead1", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int likes = 10;
-        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user);
+        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user1, new HashSet<>());
         
-        uman.addUser(user);
+        uman.addUser(user1);
+        uman.addUser(user2);
         pman.addEntry(picture);
-        pman.likePicture(picture.getId());
+        pman.likePicture(user2, picture.getId());
         
-        Picture p2 = pman.getPictures(user.getUsername()).getTarget().get(0);
+        Picture p2 = pman.getPictures(user1.getUsername()).getTarget().get(0);
         assertEquals(p2.getLikes(), likes+1);
+        assertTrue(p2.getActors().contains(user2));
     }
 
     /**
@@ -196,17 +201,21 @@ public class PictureManagerTest {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
         PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
         
-        User user = new User(0, "shithead", new HashedString("shit", false),
+        User user1 = new User(0, "shithead1", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int dislikes = 5;
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user1, new HashSet<>());
         
-        uman.addUser(user);
+        uman.addUser(user1);
+        uman.addUser(user2);
         pman.addEntry(picture);
-        pman.dislikePicture(picture.getId());
+        pman.dislikePicture(user2, picture.getId());
         
-        Picture p2 = pman.getPictures(user.getUsername()).getTarget().get(0);
+        Picture p2 = pman.getPictures(user1.getUsername()).getTarget().get(0);
         assertEquals(p2.getDislikes(), dislikes+1);
+        assertTrue(p2.getActors().contains(user2));
     }
     
 }
