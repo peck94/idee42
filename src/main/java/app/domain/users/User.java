@@ -2,6 +2,7 @@ package app.domain.users;
 
 import app.domain.Observable;
 import app.domain.utils.HashedString;
+import java.util.Objects;
 
 /**
  * Represents a user of the application.
@@ -66,5 +67,13 @@ public class User extends Observable {
                 u.getPassword().equals(getPassword()) &&
                 u.getEmail().equals(getEmail()) &&
                 u.getId() == getId());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + (int) (this.id ^ (this.id >>> 32));
+        hash = 67 * hash + Objects.hashCode(this.username);
+        return hash;
     }
 }

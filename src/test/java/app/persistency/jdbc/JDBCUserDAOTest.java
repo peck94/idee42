@@ -5,8 +5,15 @@
  */
 package app.persistency.jdbc;
 
+import app.domain.users.Email;
 import app.domain.users.User;
-import java.util.List;
+import app.domain.utils.HashedString;
+import app.exceptions.PersistencyException;
+import app.persistency.DataAccessProvider;
+import app.persistency.UserDAO;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.Properties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -19,6 +26,8 @@ import static org.junit.Assert.*;
  * @author jonathan
  */
 public class JDBCUserDAOTest {
+    private DataAccessProvider dap;
+    private static final int COUNT = 1000;
     
     public JDBCUserDAOTest() {
     }
@@ -32,7 +41,24 @@ public class JDBCUserDAOTest {
     }
     
     @Before
-    public void setUp() {
+    public void setUp() throws IOException, ClassNotFoundException, SQLException, PersistencyException {
+        // load config
+        Properties config = new Properties();
+        config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.test.properties"));
+        
+        // init persistency
+        String host = config.getProperty("jdbc.host");
+        String username = config.getProperty("jdbc.username");
+        String password = config.getProperty("jdbc.password");
+        String db = config.getProperty("jdbc.db");
+        JDBCDataAccessContext dac = new JDBCDataAccessContext(host,
+            username,
+            password,
+            db);
+        this.dap = new JDBCDataAccessProvider(dac);
+        
+        // clear table
+        dap.getUserDAO().clear();
     }
     
     @After
@@ -44,82 +70,41 @@ public class JDBCUserDAOTest {
      */
     @Test
     public void testCreate() throws Exception {
-        System.out.println("create");
-        User object = null;
-        JDBCUserDAO instance = null;
-        instance.create(object);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of get method, of class JDBCUserDAO.
-     */
-    @Test
-    public void testGet() throws Exception {
-        System.out.println("get");
-        Long id = null;
-        JDBCUserDAO instance = null;
-        User expResult = null;
-        User result = instance.get(id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of update method, of class JDBCUserDAO.
-     */
-    @Test
-    public void testUpdate() throws Exception {
-        System.out.println("update");
-        User newObject = null;
-        JDBCUserDAO instance = null;
-        instance.update(newObject);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of delete method, of class JDBCUserDAO.
-     */
-    @Test
-    public void testDelete() throws Exception {
-        System.out.println("delete");
-        Long id = null;
-        JDBCUserDAO instance = null;
-        instance.delete(id);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of getAll method, of class JDBCUserDAO.
-     */
-    @Test
-    public void testGetAll() throws Exception {
-        System.out.println("getAll");
-        JDBCUserDAO instance = null;
-        List<User> expResult = null;
-        List<User> result = instance.getAll();
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    /**
-     * Test of exists method, of class JDBCUserDAO.
-     */
-    @Test
-    public void testExists() throws Exception {
-        System.out.println("exists");
-        Long id = null;
-        JDBCUserDAO instance = null;
-        boolean expResult = false;
-        boolean result = instance.exists(id);
-        assertEquals(expResult, result);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        UserDAO dao = dap.getUserDAO();
+        for(int i = 0; i < COUNT; i++) {
+            User user = new User(i, "test" + i,
+                    new HashedString("pass" + i, false),
+                    new Email("test" + i + "@gmail.com"));
+            dao.create(user);
+            
+            User user2 = dao.get(new Long(i));
+            assertEquals(user, user2);
+        }
+        
+        for(int i = 0; i < COUNT; i++) {
+            assertTrue(dao.exists(new Long(i)));
+            assertNotNull(dao.get(new Long(i)));
+        }
+        
+        assertEquals(dao.getAll().size(), COUNT);
+        
+        for(int i = 0; i < COUNT; i++) {
+            User user = new User(i, "test" + i,
+                    new HashedString("yolo" + i, false),
+                    new Email("shit" + i + "@gmail.com"));
+            dao.update(user);
+            
+            User user2 = dao.get(new Long(i));
+            assertEquals(user, user2);
+        }
+        
+        for(int i = 0; i < COUNT; i++) {
+            dao.delete(new Long(i));
+        }
+        
+        for(int i = 0; i < COUNT; i++) {
+            assertFalse(dao.exists(new Long(i)));
+        }
     }
     
 }
