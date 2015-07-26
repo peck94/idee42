@@ -6,7 +6,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Objects;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -100,5 +102,26 @@ public class Picture extends Observable {
     public void dislike() throws DomainException {
         dislikes++;
         invalidate();
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if(!(o instanceof Picture)) {
+            return false;
+        }
+        
+        Picture p = (Picture) o;
+        return p.getId().equals(getId()) &&
+                p.getDate().equals(getDate()) &&
+                p.getLikes() == getLikes() &&
+                p.getDislikes() == getDislikes() &&
+                Arrays.equals(p.getImage(), getImage());
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Objects.hashCode(this.id);
+        return hash;
     }
 }
