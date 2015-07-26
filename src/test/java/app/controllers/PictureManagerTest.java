@@ -104,8 +104,8 @@ public class PictureManagerTest {
         
         Picture p1 = pman.getRandomPicture(user1);
         Picture p2 = pman.getRandomPicture(user2);
-        assertEquals(p1, picture1);
-        assertEquals(p2, picture2);
+        assertEquals(p1, picture2);
+        assertEquals(p2, picture1);
     }
 
     /**

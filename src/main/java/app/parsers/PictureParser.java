@@ -36,16 +36,20 @@ public class PictureParser extends Parser<Picture> {
         
         byte[] decoded = Base64.getDecoder().decode(object.get("data").getAsString());
         
-        Picture picture = new Picture(
-                decoded,
-                DateConverter.toDate(object.get("date").getAsString()),
-                object.get("likes").getAsLong(),
-                object.get("dislikes").getAsLong(),
-                new BigInteger(object.get("id").getAsString()),
-                new User(object.get("owner").getAsLong())
-        );
-        
-        return picture;
+        try{
+            Picture picture = new Picture(
+                    decoded,
+                    DateConverter.toDate(object.get("date").getAsString()),
+                    object.get("likes").getAsLong(),
+                    object.get("dislikes").getAsLong(),
+                    new BigInteger(object.get("id").getAsString()),
+                    new User(object.get("owner").getAsLong())
+            );
+
+            return picture;
+        }catch(Exception e) {
+            throw new ParseException(e.getMessage(), 0);
+        }
     }
     
 }

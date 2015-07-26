@@ -6,6 +6,7 @@ import app.domain.utils.DateConverter;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import java.math.BigInteger;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.Base64;
 import java.util.Date;
@@ -45,12 +46,13 @@ public class PictureParserTest {
      * Test of toJson method, of class PictureParser.
      */
     @Test
-    public void testToJson() throws ParseException {
+    public void testToJson() throws ParseException, NoSuchAlgorithmException {
         PictureParser parser = new PictureParser();
         
+        long owner = 0;
         String data = "yolo";
         String encoded = new String(Base64.getEncoder().encode(data.getBytes()));
-        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(0));
+        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner));
         String json = parser.toJson(picture);
         
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
@@ -59,6 +61,7 @@ public class PictureParserTest {
         assertEquals(object.get("likes").getAsLong(), picture.getLikes());
         assertEquals(object.get("dislikes").getAsLong(), picture.getDislikes());
         assertEquals(object.get("date").getAsString(), DateConverter.fromDate(picture.getDate()));
+        assertEquals(object.get("owner").getAsLong(), owner);
     }
 
     /**
@@ -79,6 +82,7 @@ public class PictureParserTest {
         object.addProperty("likes", likes);
         object.addProperty("dislikes", dislikes);
         object.addProperty("date", DateConverter.fromDate(date));
+        object.addProperty("owner", 0);
         
         PictureParser parser = new PictureParser();
         Picture picture = parser.fromJson(object.toString());

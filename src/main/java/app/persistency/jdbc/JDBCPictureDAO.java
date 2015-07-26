@@ -39,18 +39,22 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
      * @throws SQLException
      * @throws NoSuchAlgorithmException 
      */
-    private Picture convert(ResultSet rs) throws SQLException, ParseException {
-        byte[] decoded = Base64.getDecoder().decode(rs.getString(2));
-        Picture picture = new Picture(
-                decoded,
-                DateConverter.toDate(rs.getString(3)),
-                rs.getLong(4),
-                rs.getLong(5),
-                new BigInteger(rs.getString(1)),
-                new User(rs.getLong(6))
-        );
-        
-        return picture;
+    private Picture convert(ResultSet rs) throws PersistencyException {
+        try{
+            byte[] decoded = Base64.getDecoder().decode(rs.getString(2));
+            Picture picture = new Picture(
+                    decoded,
+                    DateConverter.toDate(rs.getString(3)),
+                    rs.getLong(4),
+                    rs.getLong(5),
+                    new BigInteger(rs.getString(1)),
+                    new User(rs.getLong(6))
+            );
+
+            return picture;
+        }catch(Exception e) {
+            throw new PersistencyException(e);
+        }
     }
 
     @Override
@@ -81,7 +85,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             }
             
             return convert(rs);
-        }catch(SQLException | ParseException e) {
+        }catch(Exception e) {
             throw new PersistencyException(e);
         }
     }
@@ -118,7 +122,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             }
             
             return pictures;
-        }catch(SQLException | ParseException e) {
+        }catch(Exception e) {
             throw new PersistencyException(e);
         }
     }

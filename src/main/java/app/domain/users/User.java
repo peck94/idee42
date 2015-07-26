@@ -2,6 +2,7 @@ package app.domain.users;
 
 import app.domain.Observable;
 import app.domain.utils.HashedString;
+import java.security.NoSuchAlgorithmException;
 import java.util.Objects;
 
 /**
@@ -40,12 +41,12 @@ public class User extends Observable {
         this.email = email;
     }
     
-    public User(long id) {
+    public User(long id) throws NoSuchAlgorithmException {
         super();
         this.id = id;
         this.username = "";
-        this.password = null;
-        this.email = null;
+        this.password = new HashedString("", true);
+        this.email = new Email("");
     }
     
     public long getId() {
