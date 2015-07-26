@@ -53,4 +53,10 @@ public interface DataAccessObject<T, K> {
      * @throws PersistencyException 
      */
     boolean exists(K id) throws PersistencyException;
+    
+    /**
+     * Delete all entries associated with this DAO.
+     * @throws PersistencyException 
+     */
+    void clear() throws PersistencyException;
 }

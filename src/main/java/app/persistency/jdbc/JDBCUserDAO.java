@@ -23,6 +23,7 @@ public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
     private final String UPDATE = "UPDATE users SET password = ?, email = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM users WHERE id = ? LIMIT 1";
     private final String LIST = "SELECT * FROM users";
+    private final String CLEAR = "DELETE FROM users";
 
     public JDBCUserDAO(Connection conn) {
         super(conn);
@@ -122,4 +123,12 @@ public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
         }
     }
     
+    @Override
+    public void clear() throws PersistencyException {
+        try(PreparedStatement s = getConnection().prepareStatement(CLEAR)) {
+            s.executeUpdate();
+        }catch(SQLException e) {
+            throw new PersistencyException(e);
+        }
+    }
 }

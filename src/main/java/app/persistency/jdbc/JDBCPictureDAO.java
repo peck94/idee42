@@ -25,6 +25,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM pictures WHERE id = ? LIMIT 1";
     private final String LIST = "SELECT * FROM pictures";
+    private final String CLEAR = "DELETE FROM pictures";
 
     public JDBCPictureDAO(Connection conn) {
         super(conn);
@@ -73,7 +74,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             
             ResultSet rs = s.executeQuery();
             if(!rs.next()) {
-                throw new PersistencyException("User not found: " + id);
+                throw new PersistencyException("Picture not found: " + id);
             }
             
             return convert(rs);
@@ -126,6 +127,15 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             
             ResultSet rs = s.executeQuery();
             return rs.next();
+        }catch(SQLException e) {
+            throw new PersistencyException(e);
+        }
+    }
+    
+    @Override
+    public void clear() throws PersistencyException {
+        try(PreparedStatement s = getConnection().prepareStatement(CLEAR)) {
+            s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);
         }
