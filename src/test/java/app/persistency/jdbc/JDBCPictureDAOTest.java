@@ -7,10 +7,13 @@ package app.persistency.jdbc;
 
 import app.domain.pictures.Picture;
 import app.domain.users.User;
+import app.exceptions.PersistencyException;
 import app.persistency.DataAccessProvider;
 import app.persistency.PictureDAO;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -60,7 +63,9 @@ public class JDBCPictureDAOTest {
     }
     
     @After
-    public void tearDown() {
+    public void tearDown() throws PersistencyException {
+        // clear table
+        dap.getPictureDAO().clear();
     }
 
     /**
@@ -69,20 +74,18 @@ public class JDBCPictureDAOTest {
     @Test
     public void testCreate() throws Exception {
         PictureDAO dao = dap.getPictureDAO();
+        List<BigInteger> ids = new ArrayList<>();
         Date d = new Date();
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = new BigInteger("" + i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, 2*i, i*i, id, new User(0));
-            dao.create(picture);
-            
-            Picture picture2 = dao.get(id);
-            assertEquals(picture, picture2);
+                    d, 2*i, i*i, BigInteger.ZERO, new User(0));
+            BigInteger id = dao.create(picture);
+            ids.add(id);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = new BigInteger("" + i);
+            BigInteger id = ids.get(i);
             assertTrue(dao.exists(id));
             assertNotNull(dao.get(id));
         }
@@ -90,7 +93,7 @@ public class JDBCPictureDAOTest {
         assertEquals(dao.getAll().size(), COUNT);
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = new BigInteger("" + i);
+            BigInteger id = ids.get(i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
                     d, i*i, 2*i, id, new User(0));
@@ -101,12 +104,12 @@ public class JDBCPictureDAOTest {
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = new BigInteger("" + i);
+            BigInteger id = ids.get(i);
             dao.delete(id);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = new BigInteger("" + i);
+            BigInteger id = ids.get(i);
             assertFalse(dao.exists(id));
         }
     }

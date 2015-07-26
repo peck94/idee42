@@ -1,4 +1,4 @@
-package app.main;
+package app.spring;
 
 import app.controllers.PictureManager;
 import app.controllers.SessionManager;

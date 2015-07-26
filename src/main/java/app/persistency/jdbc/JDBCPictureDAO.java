@@ -11,7 +11,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -21,7 +20,7 @@ import java.util.List;
  * @author jonathan
  */
 public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
-    private final String CREATE = "INSERT INTO pictures (id, image, date, likes, dislikes, owner) VALUES (?, ?, ?, ?, ?, ?)";
+    private final String CREATE = "INSERT INTO pictures (image, date, likes, dislikes, owner) VALUES (?, ?, ?, ?, ?)";
     private final String GET = "SELECT id, image, date, likes, dislikes, owner FROM pictures WHERE id = ?";
     private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM pictures WHERE id = ? LIMIT 1";
@@ -58,17 +57,21 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     }
 
     @Override
-    public void create(Picture object) throws PersistencyException {
+    public BigInteger create(Picture object) throws PersistencyException {
         String encoded = new String(Base64.getEncoder().encode(object.getImage()));
         
-        try(PreparedStatement s = getConnection().prepareStatement(CREATE)) {
-            s.setString(1, object.getId().toString());
-            s.setString(2, encoded);
-            s.setString(3, DateConverter.fromDate(object.getDate()));
-            s.setLong(4, object.getLikes());
-            s.setLong(5, object.getDislikes());
-            s.setLong(6, object.getOwner().getId());
+        try(PreparedStatement s = getConnection().prepareStatement(CREATE,
+                new String[]{"id"})) {
+            s.setString(1, encoded);
+            s.setString(2, DateConverter.fromDate(object.getDate()));
+            s.setLong(3, object.getLikes());
+            s.setLong(4, object.getDislikes());
+            s.setLong(5, object.getOwner().getId());
             s.executeUpdate();
+            
+            ResultSet rs = s.getGeneratedKeys();
+            rs.next();
+            return new BigInteger(rs.getString(1));
         }catch(SQLException e) {
             throw new PersistencyException(e);
         }

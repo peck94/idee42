@@ -18,7 +18,7 @@ import java.util.List;
  * @author jonathan
  */
 public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
-    private final String CREATE = "INSERT INTO users (id, username, password, email) VALUES (?, ?, ?, ?)";
+    private final String CREATE = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
     private final String GET = "SELECT id, username, password, email FROM users WHERE id = ?";
     private final String UPDATE = "UPDATE users SET password = ?, email = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM users WHERE id = ? LIMIT 1";
@@ -46,13 +46,17 @@ public class JDBCUserDAO extends JDBCGenericDAO implements UserDAO {
     }
 
     @Override
-    public void create(User object) throws PersistencyException {
-        try(PreparedStatement s = getConnection().prepareStatement(CREATE)) {
-            s.setLong(1, object.getId());
-            s.setString(2, object.getUsername());
-            s.setString(3, object.getPassword().toString());
-            s.setString(4, object.getEmail().toString());
+    public Long create(User object) throws PersistencyException {
+        try(PreparedStatement s = getConnection().prepareStatement(CREATE,
+                new String[]{"id"})) {
+            s.setString(1, object.getUsername());
+            s.setString(2, object.getPassword().toString());
+            s.setString(3, object.getEmail().toString());
             s.executeUpdate();
+            
+            ResultSet rs = s.getGeneratedKeys();
+            rs.next();
+            return rs.getLong(1);
         }catch(SQLException e) {
             throw new PersistencyException(e);
         }

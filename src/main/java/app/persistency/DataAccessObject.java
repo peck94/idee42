@@ -12,10 +12,12 @@ import java.util.List;
 public interface DataAccessObject<T, K> {
     /**
      * Create an object in persistency.
+     * This will generate a new, unique primary key.
      * @param object Model of object to create
+     * @return Primary key of created object
      * @throws app.exceptions.PersistencyException
      */
-    void create(T object) throws PersistencyException;
+    K create(T object) throws PersistencyException;
     
     /**
      * Get an object from persistency

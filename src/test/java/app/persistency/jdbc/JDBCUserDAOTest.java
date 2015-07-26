@@ -13,6 +13,8 @@ import app.persistency.DataAccessProvider;
 import app.persistency.UserDAO;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -62,7 +64,9 @@ public class JDBCUserDAOTest {
     }
     
     @After
-    public void tearDown() {
+    public void tearDown() throws PersistencyException {
+        // clear table
+        dap.getUserDAO().clear();
     }
 
     /**
@@ -71,39 +75,38 @@ public class JDBCUserDAOTest {
     @Test
     public void testCreate() throws Exception {
         UserDAO dao = dap.getUserDAO();
+        List<Long> ids = new ArrayList<>();
         for(int i = 0; i < COUNT; i++) {
             User user = new User(i, "test" + i,
                     new HashedString("pass" + i, false),
                     new Email("test" + i + "@gmail.com"));
-            dao.create(user);
-            
-            User user2 = dao.get(new Long(i));
-            assertEquals(user, user2);
+            Long id = dao.create(user);
+            ids.add(id);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            assertTrue(dao.exists(new Long(i)));
-            assertNotNull(dao.get(new Long(i)));
+            assertTrue(dao.exists(ids.get(i)));
+            assertNotNull(dao.get(ids.get(i)));
         }
         
         assertEquals(dao.getAll().size(), COUNT);
         
         for(int i = 0; i < COUNT; i++) {
-            User user = new User(i, "test" + i,
+            User user = new User(ids.get(i), "test" + i,
                     new HashedString("yolo" + i, false),
                     new Email("shit" + i + "@gmail.com"));
             dao.update(user);
             
-            User user2 = dao.get(new Long(i));
+            User user2 = dao.get(ids.get(i));
             assertEquals(user, user2);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            dao.delete(new Long(i));
+            dao.delete(ids.get(i));
         }
         
         for(int i = 0; i < COUNT; i++) {
-            assertFalse(dao.exists(new Long(i)));
+            assertFalse(dao.exists(ids.get(i)));
         }
     }
     
