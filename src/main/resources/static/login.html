@@ -22,8 +22,9 @@
   </head>
   <body>
       <div class="jumbotron">
-          <h1>Register</h1>
-          Create a new user account.
+          <h1>Login</h1>
+          Login here with your username and password.
+          Don't have an account yet? <a href="register.html">Register now!</a>
       </div>
       
       <div class="row">
@@ -31,10 +32,8 @@
           <div class="col-md-6">
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Username" id="username">
-                <input type="email" class="form-control" placeholder="E-mail address" id="email">
                 <input type="password" class="form-control" placeholder="Password" id="pass">
-                <input type="password" class="form-control" placeholder="Verify password" id="pass2">
-                <button class="btn btn-primary" onclick="register()">Submit</button>
+                <button class="btn btn-primary" onclick="login()">Submit</button>
             </div>
           </div>
           <div class="col-md-3"></div>
@@ -44,37 +43,26 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->
     <script src="js/bootstrap.min.js"></script>
+    <script src="js/js.cookie.js"></script>
     
     <script>
-        function register() {
-            pass1 = $('#pass').val();
-            pass2 = $('#pass2').val();
-            if(pass1 !== pass2) {
-                alert('Passwords don\'t match!');
-                return;
-            }
-            
+        function login() {
             data = {
                 username: $('#username').val(),
-                email: $('#email').val(),
                 password: $('#pass').val()
             };
-            console.log(data);
-            
-            json = JSON.stringify(data);
-            console.log(json);
             $.ajax({
                 type: 'POST',
-                url: '/api/user',
-                data: json,
-                contentType: "application/json",
-                dataType: 'json'
+                url: '/api/login',
+                data: data
             })
-            .done(function() {
-                alert('Registration success!');
+            .done(function(data) {
+                alert('Login success!');
+                Cookies.set('auth', data);
+                window.location = '/';
             })
             .fail(function(data) {
-                alert('Registration failed!\n' + data.responseJSON.message);
+                alert('Login failed!\n' + data.responseJSON.message);
                 console.log(data);
             });
         }
