@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Handles liking and disliking of pictures.
- * TODO:
+ * The following constraints are enforced:
  * <ul>
  * <li>only logged-in users can rate pictures</li>
  * <li>users can't rate their own pictures</li>

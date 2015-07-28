@@ -19,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Handles uploads of pictures.
+ * TODO:
+ * <ul>
+ *  <li>enforce daily limit per user</li>
+ * </ul>
  * @author jonathan
  */
 @RestController

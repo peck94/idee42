@@ -68,6 +68,9 @@ public class SpringMain {
         
         // load all pictures
         for(Picture picture: dap.getPictureDAO().getAll()) {
+            // set full owner (only ID is loaded)
+            picture.setOwner(dap.getUserDAO().get(picture.getOwner().getId()));
+            // add picture
             _pictureManager.addEntry(picture);
         }
     }

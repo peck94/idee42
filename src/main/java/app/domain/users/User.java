@@ -85,9 +85,6 @@ public class User extends Observable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + (int) (this.id ^ (this.id >>> 32));
-        hash = 67 * hash + Objects.hashCode(this.username);
-        return hash;
+        return getUsername().hashCode();
     }
 }

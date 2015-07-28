@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
@@ -30,13 +29,14 @@ public class Picture extends Observable {
     // store unique id
     private BigInteger id;
     // store owner
-    private final User owner;
+    private User owner;
     // store likers and dislikers
     private Set<User> actors;
     
     /**
      * Create picture from file
      * @param file File to create image from
+     * @param owner Owner of picture
      * @throws IOException 
      */
     public Picture(MultipartFile file, User owner) throws IOException {
@@ -100,6 +100,23 @@ public class Picture extends Observable {
     
     public User getOwner() {
         return owner;
+    }
+    
+    /**
+     * Set owner of picture.
+     * NOTE: this method does not update persistency, since it is supposed to be
+     * used *only* at init time for populating picture owners with their full
+     * user objects. It throws a DomainException should you attempt to set an
+     * owner with a different ID than the previous one.
+     * @param owner New owner
+     * @throws app.exceptions.DomainException
+     */
+    public void setOwner(User owner) throws DomainException {
+        if(this.owner != null && this.owner.getId() != owner.getId()) {
+            throw new DomainException("Cannot change the owner of a picture.");
+        }
+        
+        this.owner = owner;
     }
     
     public Set<User> getActors() {
