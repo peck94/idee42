@@ -38,10 +38,10 @@
           <li role="presentation">
               <a href="upload.html" role="button">Upload</a>
           </li>
-          <li role="presentation"  class="active">
+          <li role="presentation">
               <a href="rate.html" role="button">Rate</a>
           </li>
-          <li role="presentation">
+          <li role="presentation"  class="active">
               <a href="pictures.html" role="button">My pictures</a>
           </li>
           <li role="presentation">
@@ -51,14 +51,10 @@
       <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
-            <h2>Rate</h2>
-            Rate a picture.
+            <h2>My pictures</h2>
+            A listing of pictures you uploaded.
             
-            <div id="picture" class="thumbnail"></div>
-            <div class="btn-group">
-                <button class="btn btn-primary btn-lg" onclick="like()">Like</button>
-                <button class="btn btn-danger btn-lg" onclick="dislike()">Dislike</button>
-            </div>
+            <div id="pictures"></div>
           </div>
           <div class="col-md-3"></div>
       </div>
@@ -70,24 +66,17 @@
     <script src="js/js.cookie.js"></script>
     
     <script>
-        var current;
-        
-        function getPicture() {
+        function getPictures() {
             $.ajax({
                 type: 'GET',
-                url: '/api/carousel',
+                url: '/api/pictures',
                 beforeSend: function(req){
                     req.setRequestHeader('auth', Cookies.get('auth'));
                 }
             })
             .done(function(data) {
+                alert('Images fetched!');
                 console.log(data);
-                current = JSON.parse(data);
-                img = $('<img>');
-                img.attr('src', 'data:image/png;base64,' + current.data);
-                
-                $('#picture').html('');
-                img.appendTo('#picture');
             })
             .fail(function(data) {
                 alert('Failed to fetch an image!\n' + data.responseJSON.message);
@@ -95,49 +84,7 @@
             });
         }
         
-        function like() {
-            $.ajax({
-                type: 'POST',
-                url: '/api/like',
-                beforeSend: function(req){
-                    req.setRequestHeader('auth', Cookies.get('auth'));
-                },
-                data: {
-                    id: current.id
-                }
-            })
-            .done(function(data) {
-                alert('Picture liked!');
-                getPicture();
-            })
-            .fail(function(data) {
-                alert('Failed to like this picture!\n' + data.responseJSON.message);
-                console.log(data);
-            });
-        }
-        
-        function dislike() {
-            $.ajax({
-                type: 'POST',
-                url: '/api/dislike',
-                beforeSend: function(req){
-                    req.setRequestHeader('auth', Cookies.get('auth'));
-                },
-                data: {
-                    id: current.id
-                }
-            })
-            .done(function(data) {
-                alert('Picture disliked!');
-                getPicture();
-            })
-            .fail(function(data) {
-                alert('Failed to dislike this picture!\n' + data.responseJSON.message);
-                console.log(data);
-            });
-        }
-        
-        setTimeout('getPicture()', 500);
+        setTimeout('getPictures()', 500);
     </script>
   </body>
 </html>
