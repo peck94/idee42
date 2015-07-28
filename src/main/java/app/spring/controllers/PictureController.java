@@ -10,10 +10,10 @@ import app.exceptions.SpringException;
 import app.parsers.PictureParser;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
-import java.math.BigInteger;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -58,9 +58,10 @@ public class PictureController {
     @RequestMapping(value="/api/like", method=POST)
     public void like(
         @RequestParam(value="id") String id,
-        @RequestHeader(value="auth") String auth) throws SpringException {
+        @RequestHeader(value="auth") String auth,
+        HttpServletRequest request) throws SpringException {
         // check whether the user is logged in
-        SessionKey key = new SessionKey(auth);
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("You are not logged in.");
         }
@@ -85,9 +86,10 @@ public class PictureController {
     @RequestMapping(value="/api/dislike", method=POST)
     public void dislike(
         @RequestParam(value="id") String id,
-        @RequestHeader(value="auth") String auth) throws SpringException {
+        @RequestHeader(value="auth") String auth,
+        HttpServletRequest request) throws SpringException {
         // check whether the user is logged in
-        SessionKey key = new SessionKey(auth);
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("You are not logged in.");
         }
@@ -114,8 +116,9 @@ public class PictureController {
      */
     @RequestMapping(value="/api/pictures", method=GET)
     public List<Long> list(
-        @RequestHeader(value="auth") String auth) throws SpringException {
-        SessionKey key = new SessionKey(auth);
+        @RequestHeader(value="auth") String auth,
+            HttpServletRequest request) throws SpringException {
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("Invalid session");
         }
@@ -144,8 +147,9 @@ public class PictureController {
     @RequestMapping(value="/api/pictures/{id}", method=GET)
     public String getPicture(
         @RequestHeader(value="auth") String auth,
-        @PathVariable(value="id") String id) throws SpringException {
-        SessionKey key = new SessionKey(auth);
+        @PathVariable(value="id") String id,
+        HttpServletRequest request) throws SpringException {
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("Invalid session");
         }
@@ -175,8 +179,9 @@ public class PictureController {
     @RequestMapping(value="/api/pictures/{id}", method=DELETE)
     public Message delPicture(
         @RequestHeader(value="auth") String auth,
-        @PathVariable(value="id") String id) throws SpringException {
-        SessionKey key = new SessionKey(auth);
+        @PathVariable(value="id") String id,
+        HttpServletRequest request) throws SpringException {
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("Invalid session");
         }

@@ -10,25 +10,34 @@ import java.security.SecureRandom;
 public class SessionKey {
     // store key
     private BigInteger key;
+    // store intended IP
+    private String ip;
     
     /**
      * Create a new session key
      * @param rng RNG to generate key with
+     * @param ip Origin IP
      */
-    public SessionKey(SecureRandom rng) {
+    public SessionKey(SecureRandom rng, String ip) {
         key = new BigInteger(512, rng);
     }
     
     /**
      * Create session key from string
      * @param auth String
+     * @param ip Origin IP
      */
-    public SessionKey(String auth) {
+    public SessionKey(String auth, String ip) {
         key = new BigInteger(auth, 16);
+        this.ip = ip;
     }
     
     public BigInteger getKey() {
         return key;
+    }
+    
+    public String getIp() {
+        return ip;
     }
     
     @Override
@@ -48,6 +57,6 @@ public class SessionKey {
         }
         
         SessionKey s = (SessionKey) o;
-        return s.getKey().equals(key);
+        return getKey().equals(s.getKey()) && getIp().equals(s.getIp());
     }
 }

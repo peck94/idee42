@@ -9,6 +9,7 @@ import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
 import app.parsers.PictureParser;
 import java.text.ParseException;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,9 +44,10 @@ public class CarouselController {
      */
     @RequestMapping(method=GET)
     public String random(
-        @RequestHeader(value="auth") String auth) throws SpringException {
+        @RequestHeader(value="auth") String auth,
+            HttpServletRequest request) throws SpringException {
         // check whether this token belongs to a logged-in user
-        SessionKey key = new SessionKey(auth);
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(sessionManager.isLoggedIn(key)) {
             // attempt to fetch a random picture
             try{

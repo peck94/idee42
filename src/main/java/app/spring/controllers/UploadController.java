@@ -9,6 +9,7 @@ import app.exceptions.SpringException;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
 import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,9 +46,10 @@ public class UploadController {
     @RequestMapping(method=POST)
     public Message upload(
         @RequestParam(value="file") MultipartFile file,
-        @RequestHeader(value="auth") String auth) throws SpringException {
+        @RequestHeader(value="auth") String auth,
+        HttpServletRequest request) throws SpringException {
         // verify that this user is logged in
-        SessionKey key = new SessionKey(auth);
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(sessionManager.isLoggedIn(key)) {
             // attempt to upload this file
             try{

@@ -13,6 +13,7 @@ import app.parsers.UserParser;
 import app.spring.messages.Message;
 import app.spring.messages.OkMessage;
 import java.text.ParseException;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -75,9 +76,11 @@ public class UserController {
      * @throws SpringException 
      */
     @RequestMapping(method=DELETE)
-    public Message delete(@RequestHeader(value="auth") String auth) throws SpringException {
+    public Message delete(
+            @RequestHeader(value="auth") String auth,
+            HttpServletRequest request) throws SpringException {
         // check session
-        SessionKey key = new SessionKey(auth);
+        SessionKey key = new SessionKey(auth, request.getRemoteAddr());
         if(!sessionManager.isLoggedIn(key)) {
             throw new SpringException("Invalid session.");
         }

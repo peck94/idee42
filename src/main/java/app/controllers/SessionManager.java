@@ -121,10 +121,11 @@ public class SessionManager extends Controller {
      * Login a user
      * @param username Username
      * @param password Plaintext password
+     * @param ip IP address of logged-in user
      * @return Session key for user 
      * @throws app.exceptions.ControllerException 
      */
-    public SessionKey login(String username, String password) throws ControllerException {
+    public SessionKey login(String username, String password, String ip) throws ControllerException {
         try {
             // hash the plaintext password
             HashedString hashedPassword = new HashedString(password, false);
@@ -135,7 +136,7 @@ public class SessionManager extends Controller {
                 // generate a new, secure random session key
                 SessionKey key;
                 do{
-                    key = new SessionKey(rng);
+                    key = new SessionKey(rng, ip);
                 }while(keys.containsKey(key));
 
                 // create and store the session

@@ -53,11 +53,11 @@ public class SessionManagerTest {
                     new Email("shit@fuck.com"));
         
         uman.addUser(user);
-        assertNotNull(sman.login(user.getUsername(), password));
+        assertNotNull(sman.login(user.getUsername(), password, ""));
         
         boolean ok = false;
         try{
-            sman.login(user.getUsername(), "kak");
+            sman.login(user.getUsername(), "kak", "");
         }catch(Exception e) {
             ok = true;
         }
@@ -76,7 +76,7 @@ public class SessionManagerTest {
                     new Email("shit@fuck.com"));
         
         uman.addUser(user);
-        SessionKey key = sman.login(user.getUsername(), password);
+        SessionKey key = sman.login(user.getUsername(), password, "");
         sman.logout(key);
         
         assertFalse(sman.isLoggedIn(key));
@@ -94,7 +94,7 @@ public class SessionManagerTest {
                     new Email("shit@fuck.com"));
         
         uman.addUser(user);
-        SessionKey key = sman.login(user.getUsername(), password);
+        SessionKey key = sman.login(user.getUsername(), password, "");
         assertTrue(sman.isLoggedIn(key));
     }
 
@@ -109,13 +109,19 @@ public class SessionManagerTest {
         String password = "shit";
         User user = new User(0, "shithead", new HashedString(password, false),
                     new Email("shit@fuck.com"));
+        String ip1 = "ip1";
+        String ip2 = "ip2";
         
         uman.addUser(user);
-        SessionKey key = sman.login(user.getUsername(), password);
-        assertEquals(sman.getUser(key), user);
+        
+        SessionKey key1 = sman.login(user.getUsername(), password, ip1);
+        assertEquals(sman.getUser(key1), user);
+        
+        SessionKey key2 = new SessionKey(key1.toString(), ip2);
+        assertFalse(sman.isLoggedIn(key2));
         
         Thread.sleep(2*timeout);
-        assertFalse(sman.isLoggedIn(key));
+        assertFalse(sman.isLoggedIn(key1));
     }
     
 }
