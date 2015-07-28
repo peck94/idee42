@@ -170,7 +170,7 @@ public class SessionManager extends Controller {
      */
     public void logout(SessionKey key) throws ControllerException {
         // check whether the session actually exists
-        if(!keys.containsKey(key)) {
+        if(!isLoggedIn(key)) {
             throw new ControllerException("Invalid key");
         }
         
@@ -186,7 +186,7 @@ public class SessionManager extends Controller {
      * @return Whether or not the key corresponds to an existing session
      */
     public boolean isLoggedIn(SessionKey key) {
-        return keys.containsKey(key);
+        return keys.containsKey(key) && keys.get(key).getKey().getIp().equals(key.getIp());
     }
     
     /**
@@ -197,7 +197,7 @@ public class SessionManager extends Controller {
      */
     public User getUser(SessionKey key) throws ControllerException {
         // check whether the key exists
-        if(keys.containsKey(key)) {
+        if(isLoggedIn(key)) {
             return keys.get(key).getUser();
         }else{
             throw new ControllerException("User not logged in: " + key);

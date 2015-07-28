@@ -2,6 +2,7 @@ package app.domain.users;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;
+import java.util.Objects;
 
 /**
  * Represents a session key.
@@ -20,6 +21,7 @@ public class SessionKey {
      */
     public SessionKey(SecureRandom rng, String ip) {
         key = new BigInteger(512, rng);
+        this.ip = ip;
     }
     
     /**
@@ -44,12 +46,7 @@ public class SessionKey {
     public String toString() {
         return key.toString(16);
     }
-    
-    @Override
-    public int hashCode() {
-        return key.hashCode();
-    }
-    
+        
     @Override
     public boolean equals(Object o) {
         if(!(o instanceof SessionKey)) {
@@ -57,6 +54,11 @@ public class SessionKey {
         }
         
         SessionKey s = (SessionKey) o;
-        return getKey().equals(s.getKey()) && getIp().equals(s.getIp());
+        return getKey().equals(s.getKey());
+    }
+
+    @Override
+    public int hashCode() {
+        return getKey().hashCode();
     }
 }

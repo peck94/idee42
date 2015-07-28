@@ -45,7 +45,7 @@ public class LoginController {
             
             // return the session key as a string
             return key.toString();
-        }catch(Exception e) {
+        }catch(ControllerException e) {
             throw new SpringException("Invalid credentials for " + username);
         }
     }
