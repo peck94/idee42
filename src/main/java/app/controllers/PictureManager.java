@@ -162,7 +162,14 @@ public class PictureManager extends Controller {
         // verify that we haven't already judged every other picture
         boolean found = false;
         for(Picture p: pics) {
-            if(p.getOwner().getId() != exclude.getId() && !p.getActors().contains(exclude)) {
+            /*
+            * Requirements:
+            * 1. different owner from exclude;
+            * 2. not expired yet;
+            * 3. not yet (dis)liked by exclude.
+            */
+            if(p.getOwner().getId() != exclude.getId() && !p.isExpired() &&
+                    !p.getActors().contains(exclude)) {
                 found = true;
                 break;
             }
