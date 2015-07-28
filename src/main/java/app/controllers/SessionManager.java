@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 /**
  * Manages sessions of logged-in users.
@@ -45,12 +46,15 @@ public class SessionManager extends Controller {
     private final long timeout;
     // store rng
     private final SecureRandom rng;
-    // validator thread
-    private Thread validator;
+    // validator executor
+    private java.util.concurrent.Executor validator;
+    // store executor state
+    private boolean active;
     
     private class Validator implements Runnable {
         @Override
         public void run() {
+            active = true;
             // store timeout (calculated later)
             long timeout = 0;
             // as long as there are sessions
@@ -92,6 +96,7 @@ public class SessionManager extends Controller {
                     break;
                 }
             }
+            active = false;
         }
     }
     
@@ -108,7 +113,8 @@ public class SessionManager extends Controller {
         rng = new SecureRandom();
         this.timeout = timeout;
         this.userManager = userManager;
-        validator = new Thread();
+        validator = Executors.newSingleThreadExecutor();
+        active = false;
     }
     
     /**
@@ -138,10 +144,9 @@ public class SessionManager extends Controller {
                 keys.put(key, session);
 
                 // if this is the first session
-                if(!validator.isAlive()) {
+                if(!active) {
                     // start validator thread to keep track of expirations
-                    validator = new Thread(new Validator());
-                    validator.start();
+                    validator.execute(new Validator());
                 }
 
                 return key;

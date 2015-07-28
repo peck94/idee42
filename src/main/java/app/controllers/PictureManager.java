@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.Executors;
 import org.springframework.web.multipart.MultipartFile;
-
 /**
  * Stores all pictures and their associated users.
  * @author jonathan
@@ -29,10 +29,12 @@ public class PictureManager extends Controller {
     private final Map<BigInteger, Picture> pictures;
     // store RNG
     private final Random rng;
-    // store validator thread
-    private Thread validator;
+    // store validator executor
+    private java.util.concurrent.Executor validator;
     // store picture timeout
     private final long timeout;
+    // store activity flag
+    private boolean active;
     
     /**
      * This class ensures that expired pictures get marked as such.
@@ -40,6 +42,7 @@ public class PictureManager extends Controller {
     private class Validator implements Runnable {
         @Override
         public void run() {
+            active = true;
             while(pictures.size() > 0) {
                 long minDiff = timeout;
                 Date d = new Date();
@@ -65,6 +68,7 @@ public class PictureManager extends Controller {
                     break;
                 }
             }
+            active = false;
         }
     }
     
@@ -80,8 +84,9 @@ public class PictureManager extends Controller {
         assocs = new HashMap<>();
         pictures = new HashMap<>();
         rng = new Random();
-        validator = new Thread();
+        validator = Executors.newSingleThreadExecutor();
         this.timeout = timeout;
+        active = false;
     }
     
     /**
@@ -115,9 +120,8 @@ public class PictureManager extends Controller {
         pictures.put(picture.getId(), picture);
         
         // start validator if necessary
-        if(!validator.isAlive()) {
-            validator = new Thread(new Validator());
-            validator.start();
+        if(!active) {
+            validator.execute(new Validator());
         }
         
         // try to update persistency
