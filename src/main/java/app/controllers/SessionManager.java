@@ -45,6 +45,8 @@ public class SessionManager extends Controller {
     private final long timeout;
     // store rng
     private final SecureRandom rng;
+    // validator thread
+    private Thread validator;
     
     private class Validator implements Runnable {
         @Override
@@ -106,6 +108,7 @@ public class SessionManager extends Controller {
         rng = new SecureRandom();
         this.timeout = timeout;
         this.userManager = userManager;
+        validator = new Thread();
     }
     
     /**
@@ -135,10 +138,10 @@ public class SessionManager extends Controller {
                 keys.put(key, session);
 
                 // if this is the first session
-                if(sessions.size() == 1) {
+                if(!validator.isAlive()) {
                     // start validator thread to keep track of expirations
-                    Thread t = new Thread(new Validator());
-                    t.start();
+                    validator = new Thread(new Validator());
+                    validator.start();
                 }
 
                 return key;

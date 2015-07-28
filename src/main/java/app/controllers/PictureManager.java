@@ -30,25 +30,22 @@ public class PictureManager extends Controller {
     // store RNG
     private final Random rng;
     // store validator thread
-    private final Thread validator;
+    private Thread validator;
+    // store picture timeout
+    private final long timeout;
     
     /**
      * This class ensures that expired pictures get marked as such.
      */
     private class Validator implements Runnable {
-        private long timeout;
-        
-        public Validator(long timeout) {
-            this.timeout = timeout;
-        }
-        
         @Override
         public void run() {
-            while(true) {
+            while(pictures.size() > 0) {
                 long minDiff = timeout;
                 Date d = new Date();
                 for(Picture p: pictures.values()) {
                     long diff = d.getTime() - p.getDate().getTime();
+                    System.out.println(diff);
                     if(diff > timeout) {
                         // mark picture as expired
                         try{
@@ -75,6 +72,7 @@ public class PictureManager extends Controller {
      * Create new picture manager
      * @param communicator
      * @param userManager User manager
+     * @param timeout Picture lifetime
      */
     public PictureManager(PersistencyCommunicator communicator, UserManager userManager, long timeout) {
         super(communicator);
@@ -82,8 +80,8 @@ public class PictureManager extends Controller {
         assocs = new HashMap<>();
         pictures = new HashMap<>();
         rng = new Random();
-        validator = new Thread(new Validator(timeout));
-        validator.start();
+        validator = new Thread();
+        this.timeout = timeout;
     }
     
     /**
@@ -115,6 +113,12 @@ public class PictureManager extends Controller {
         assocs.get(user.getUsername()).addPicture(picture);
         // put picture in repo
         pictures.put(picture.getId(), picture);
+        
+        // start validator if necessary
+        if(!validator.isAlive()) {
+            validator = new Thread(new Validator());
+            validator.start();
+        }
         
         // try to update persistency
         try{
