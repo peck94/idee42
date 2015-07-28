@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" ng-app>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <title>Idee42</title>
+    
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.min.js"></script>
+
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <div class="jumbotron">
+          <h1>Idee42</h1>
+          Please note that this is a demo application not meant for public consumption.
+      </div>
+      <ul class="nav nav-tabs">
+          <li role="presentation">
+            <a href="index.html" role="button">Home</a>
+          </li>
+          <li role="presentation">
+              <a href="register.html" role="button">Register</a>
+          </li>
+          <li role="presentation">
+            <a href="login.html" role="button">Login</a>
+          </li>
+          <li role="presentation" class="active">
+              <a href="upload.html" role="button">Upload</a>
+          </li>
+          <li role="presentation">
+              <a href="rate.html" role="button">Rate</a>
+          </li>
+          <li role="presentation">
+              <a href="logout.html" role="button">Logout</a>
+          </li>
+      </ul>
+      <div class="row">
+          <div class="col-md-3"></div>
+          <div class="col-md-6">
+            <h2>Upload</h2>
+            Upload a picture.
+            
+            <form enctype="multipart/form-data">
+                <input name="file" type="file" />
+                <input type="button" value="Upload" />
+            </form>
+            <progress></progress>
+          </div>
+          <div class="col-md-3"></div>
+      </div>
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/js.cookie.js"></script>
+    
+    <script>
+        $(':button').click(function(){
+            var formData = new FormData($('form')[0]);
+            $.ajax({
+                url: '/api/upload',
+                type: 'POST',
+                xhr: function() {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if(myXhr.upload){
+                        myXhr.upload.addEventListener('progress', handler, false);
+                    }
+                    return myXhr;
+                },
+                beforeSend: function(req) {
+                    req.setRequestHeader('auth', Cookies.get('auth'));
+                },
+                success: function() {
+                    alert('Upload completed successfully!');
+                },
+                error: function(data) {
+                    alert('Upload failed!\n' + data.responseJSON.message);
+                },
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        });
+        
+        function handler(e){
+            if(e.lengthComputable){
+                $('progress').attr({value:e.loaded, max:e.total});
+            }
+        }
+    </script>
+  </body>
+</html>
