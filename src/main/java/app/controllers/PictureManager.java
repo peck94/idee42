@@ -49,7 +49,7 @@ public class PictureManager extends Controller {
                     
                     // check expiry
                     long diff = d.getTime() - p.getDate().getTime();
-                    if(timeout-diff < 0) {
+                    if(diff > timeout) {
                         try{
                             p.setExpired(true);
                         }catch(DomainException e) {
