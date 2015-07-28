@@ -25,7 +25,7 @@ public class PictureManager extends Controller {
     // store associations
     private final Map<String, UserPicturesAssociation> assocs;
     // store pictures
-    private final Map<BigInteger, Picture> pictures;
+    private final Map<Long, Picture> pictures;
     // store RNG
     private final Random rng;
     // store validator thread
@@ -159,6 +159,16 @@ public class PictureManager extends Controller {
     }
     
     /**
+     * Check if a user has any pictures.
+     * @param username Username to check
+     * @return 
+     */
+    public boolean hasPictures(String username) {
+        return assocs.containsKey(username) &&
+                assocs.get(username).getTarget().size() > 0;
+    }
+    
+    /**
      * Get a random picture.
      * The pictures that belong to the user requesting the random picture are
      * excluded, so that users will never rate their own pictures.
@@ -212,7 +222,7 @@ public class PictureManager extends Controller {
      * @throws app.exceptions.ControllerException 
      */
     public void upload(User user, MultipartFile file) throws IOException, ControllerException {
-        Picture picture = new Picture(file, user);
+        Picture picture = new Picture(-1, file, user);
         addEntry(picture);
     }
     
@@ -222,7 +232,7 @@ public class PictureManager extends Controller {
      * @return Picture with this ID
      * @throws ControllerException Picture not found
      */
-    public Picture getPictureById(BigInteger id) throws ControllerException {
+    public Picture getPictureById(long id) throws ControllerException {
         // fetch the picture from our repo
         if(pictures.containsKey(id)) {
             return pictures.get(id);
@@ -237,7 +247,7 @@ public class PictureManager extends Controller {
      * @param id ID of picture to like
      * @throws app.exceptions.ControllerException
      */
-    public void likePicture(User user, BigInteger id) throws ControllerException {
+    public void likePicture(User user, long id) throws ControllerException {
         try{
             getPictureById(id).like(user);
         }catch(DomainException e) {
@@ -251,7 +261,7 @@ public class PictureManager extends Controller {
      * @param id ID of picture to dislike
      * @throws app.exceptions.ControllerException
      */
-    public void dislikePicture(User user, BigInteger id) throws ControllerException {
+    public void dislikePicture(User user, long id) throws ControllerException {
         try{
             getPictureById(id).dislike(user);
         }catch(DomainException e) {

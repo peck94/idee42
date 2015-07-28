@@ -2,8 +2,8 @@ package app.domain.users;
 
 import app.domain.Observable;
 import app.domain.utils.HashedString;
+import app.exceptions.DomainException;
 import java.security.NoSuchAlgorithmException;
-import java.util.Objects;
 
 /**
  * Represents a user of the application.
@@ -18,7 +18,7 @@ import java.util.Objects;
  */
 public class User extends Observable {
     // store id
-    private final long id;
+    private long id;
     // store username
     private final String username;
     // store password
@@ -71,6 +71,21 @@ public class User extends Observable {
     
     public Email getEmail() {
         return email;
+    }
+    
+    /**
+     * Set the ID.
+     * This should only happen upon creation of a new Picture.
+     * The convention is that anything with an ID of -1 is new.
+     * @param id
+     * @throws DomainException 
+     */
+    public void setId(long id) throws DomainException {
+        if(this.id != -1) {
+            throw new DomainException("Can't modify the ID after init!");
+        }
+        
+        this.id = id;
     }
     
     @Override

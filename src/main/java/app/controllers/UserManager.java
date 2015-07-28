@@ -72,4 +72,18 @@ public class UserManager extends Controller {
         // don't leak references
         return new ArrayList<>(users.values());
     }
+    
+    /**
+     * Delete a user.
+     * @param user User to delete
+     * @throws ControllerException 
+     */
+    public void deleteUser(User user) throws ControllerException {
+        try{
+            users.remove(user.getUsername());
+            user.delete();
+        }catch(DomainException e) {
+            throw new ControllerException(e);
+        }
+    }
 }

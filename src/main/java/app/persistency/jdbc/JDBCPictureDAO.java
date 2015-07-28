@@ -5,7 +5,6 @@ import app.domain.users.User;
 import app.domain.utils.DateConverter;
 import app.exceptions.PersistencyException;
 import app.persistency.PictureDAO;
-import java.math.BigInteger;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -57,7 +56,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
                     DateConverter.toDate(rs.getString(3)),
                     rs.getLong(4),
                     rs.getLong(5),
-                    new BigInteger(rs.getString(1)),
+                    rs.getLong(1),
                     new User(rs.getLong(6)),
                     actors,
                     rs.getBoolean(7)
@@ -70,7 +69,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     }
 
     @Override
-    public BigInteger create(Picture object) throws PersistencyException {
+    public Long create(Picture object) throws PersistencyException {
         String encoded = new String(Base64.getEncoder().encode(object.getImage()));
         StringJoiner actors = new StringJoiner(",");
         for(User user: object.getActors()) {
@@ -90,16 +89,16 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             
             ResultSet rs = s.getGeneratedKeys();
             rs.next();
-            return new BigInteger(rs.getString(1));
+            return rs.getLong(1);
         }catch(SQLException e) {
             throw new PersistencyException(e);
         }
     }
 
     @Override
-    public Picture get(BigInteger id) throws PersistencyException {
+    public Picture get(Long id) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(GET)) {
-            s.setString(1, id.toString());
+            s.setLong(1, id);
             
             ResultSet rs = s.executeQuery();
             if(!rs.next()) {
@@ -123,7 +122,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             s.setLong(1, newObject.getLikes());
             s.setLong(2, newObject.getDislikes());
             s.setString(3, actors.toString());
-            s.setString(4, newObject.getId().toString());
+            s.setLong(4, newObject.getId());
             s.setBoolean(5, newObject.isExpired());
             s.executeUpdate();
         }catch(SQLException e) {
@@ -132,9 +131,9 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     }
 
     @Override
-    public void delete(BigInteger id) throws PersistencyException {
+    public void delete(Long id) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(DELETE)) {
-            s.setString(1, id.toString());
+            s.setLong(1, id);
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);
@@ -157,9 +156,9 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
     }
 
     @Override
-    public boolean exists(BigInteger id) throws PersistencyException {
+    public boolean exists(Long id) throws PersistencyException {
         try(PreparedStatement s = getConnection().prepareStatement(GET)) {
-            s.setString(1, id.toString());
+            s.setLong(1, id);
             
             ResultSet rs = s.executeQuery();
             return rs.next();

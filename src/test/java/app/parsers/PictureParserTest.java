@@ -54,11 +54,11 @@ public class PictureParserTest {
         long owner = 0;
         String data = "yolo";
         String encoded = new String(Base64.getEncoder().encode(data.getBytes()));
-        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner), new HashSet<>(), false);
+        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, 1, new User(owner), new HashSet<>(), false);
         String json = parser.toJson(picture);
         
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
-        assertEquals(new BigInteger(object.get("id").getAsString()), picture.getId());
+        assertEquals(object.get("id").getAsLong(), picture.getId());
         assertEquals(object.get("data").getAsString(), encoded);
         assertEquals(object.get("likes").getAsLong(), picture.getLikes());
         assertEquals(object.get("dislikes").getAsLong(), picture.getDislikes());
@@ -72,7 +72,7 @@ public class PictureParserTest {
      */
     @Test
     public void testFromJson() throws ParseException {
-        BigInteger id = BigInteger.ZERO;
+        long id = 0;
         long likes = 10;
         long dislikes = 5;
         Date date = new Date();

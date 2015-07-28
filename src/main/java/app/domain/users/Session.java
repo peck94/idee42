@@ -4,6 +4,7 @@ import java.util.Date;
 
 /**
  * Represents a session of a logged-in user.
+ * TODO: prevent session hijacking.
  * @author jonathan
  */
 public class Session {

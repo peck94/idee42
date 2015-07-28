@@ -75,18 +75,18 @@ public class JDBCPictureDAOTest {
     @Test
     public void testCreate() throws Exception {
         PictureDAO dao = dap.getPictureDAO();
-        List<BigInteger> ids = new ArrayList<>();
+        List<Long> ids = new ArrayList<>();
         Date d = new Date();
         for(int i = 0; i < COUNT; i++) {
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, 2*i, i*i, BigInteger.ZERO, new User(0), new HashSet<>(), false);
-            BigInteger id = dao.create(picture);
+                    d, 2*i, i*i, 0, new User(0), new HashSet<>(), false);
+            long id = dao.create(picture);
             ids.add(id);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = ids.get(i);
+            long id = ids.get(i);
             assertTrue(dao.exists(id));
             assertNotNull(dao.get(id));
         }
@@ -94,7 +94,7 @@ public class JDBCPictureDAOTest {
         assertEquals(dao.getAll().size(), COUNT);
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = ids.get(i);
+            long id = ids.get(i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
                     d, i*i, 2*i, id, new User(0), new HashSet<>(), false);
@@ -105,12 +105,12 @@ public class JDBCPictureDAOTest {
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = ids.get(i);
+            long id = ids.get(i);
             dao.delete(id);
         }
         
         for(int i = 0; i < COUNT; i++) {
-            BigInteger id = ids.get(i);
+            long id = ids.get(i);
             assertFalse(dao.exists(id));
         }
     }

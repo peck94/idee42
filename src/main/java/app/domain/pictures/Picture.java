@@ -27,7 +27,7 @@ public class Picture extends Observable {
     // store number of dislikes
     private long dislikes;
     // store unique id
-    private BigInteger id;
+    private long id;
     // store owner
     private User owner;
     // store likers and dislikers
@@ -41,22 +41,15 @@ public class Picture extends Observable {
      * @param owner Owner of picture
      * @throws IOException 
      */
-    public Picture(MultipartFile file, User owner) throws IOException {
+    public Picture(long id, MultipartFile file, User owner) throws IOException {
         super();
+        this.id = id;
         this.image = file.getBytes();
         this.date = new Date();
         this.likes = 0;
         this.dislikes = 0;
         this.owner = owner;
         this.actors = new HashSet<>();
-        
-        try{
-            MessageDigest digest = MessageDigest.getInstance("SHA-512");
-            digest.update(file.getBytes());
-            this.id = new BigInteger(digest.digest());
-        }catch(NoSuchAlgorithmException e) {
-            System.out.println(e);
-        }
     }
     
     /**
@@ -68,9 +61,10 @@ public class Picture extends Observable {
      * @param id ID
      * @param owner Owner of picture
      * @param actors Users who liked or disliked the picture
+     * @param expired Is it expired?
      */
     public Picture(byte[] image, Date date, long likes, long dislikes,
-            BigInteger id, User owner, Set<User> actors, boolean expired) {
+            long id, User owner, Set<User> actors, boolean expired) {
         this.image = image;
         this.date = date;
         this.likes = likes;
@@ -97,7 +91,7 @@ public class Picture extends Observable {
         return dislikes;
     }
     
-    public BigInteger getId() {
+    public long getId() {
         return id;
     }
     
@@ -171,6 +165,21 @@ public class Picture extends Observable {
         invalidate();
     }
     
+    /**
+     * Set the ID.
+     * This should only happen upon creation of a new Picture.
+     * The convention is that anything with an ID of -1 is new.
+     * @param id
+     * @throws DomainException 
+     */
+    public void setId(long id) throws DomainException {
+        if(this.id != -1) {
+            throw new DomainException("Can't modify ID after init!");
+        }
+        
+        this.id = id;
+    }
+    
     @Override
     public boolean equals(Object o) {
         if(!(o instanceof Picture)) {
@@ -178,13 +187,11 @@ public class Picture extends Observable {
         }
         
         Picture p = (Picture) o;
-        return p.getId().equals(getId());
+        return p.getId() == getId();
     }
 
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + Objects.hashCode(this.id);
-        return hash;
+        return (int) getId();
     }
 }

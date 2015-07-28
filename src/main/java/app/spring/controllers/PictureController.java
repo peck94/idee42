@@ -43,7 +43,7 @@ public class PictureController {
     @Autowired
     private SessionManager sessionManager;
     // parser
-    private PictureParser parser;
+    private final PictureParser parser;
     
     public PictureController() {
         parser = new PictureParser();
@@ -66,7 +66,7 @@ public class PictureController {
         }
         
         // attempt to like the picture
-        BigInteger pic = new BigInteger(id);
+        long pic = Long.parseLong(id);
         try{
             // get the user
             User user = sessionManager.getUser(key);
@@ -93,7 +93,7 @@ public class PictureController {
         }
         
         // attempt to dislike the picture
-        BigInteger pic = new BigInteger(id);
+        long pic = Long.parseLong(id);
         try{
             // get the user
             User user = sessionManager.getUser(key);
@@ -113,7 +113,7 @@ public class PictureController {
      * @throws app.exceptions.SpringException
      */
     @RequestMapping(value="/api/pictures", method=GET)
-    public List<BigInteger> list(
+    public List<Long> list(
         @RequestHeader(value="auth") String auth) throws SpringException {
         SessionKey key = new SessionKey(auth);
         if(!sessionManager.isLoggedIn(key)) {
@@ -123,7 +123,7 @@ public class PictureController {
         try{
             User user = sessionManager.getUser(key);
             List<Picture> pics = pictureManager.getPictures(user.getUsername()).getTarget();
-            List<BigInteger> ids = new ArrayList<>();
+            List<Long> ids = new ArrayList<>();
             for(Picture pic: pics) {
                 ids.add(pic.getId());
             }
@@ -151,7 +151,7 @@ public class PictureController {
         }
         
         try{
-            BigInteger idPic = new BigInteger(id);
+            long idPic = Long.parseLong(id);
             Picture pic = pictureManager.getPictureById(idPic);
             User user = sessionManager.getUser(key);
             if(!pictureManager.getPictures(user.getUsername()).getTarget().contains(pic)) {
@@ -182,7 +182,7 @@ public class PictureController {
         }
         
         try{
-            BigInteger idPic = new BigInteger(id);
+            long idPic = Long.parseLong(id);
             Picture pic = pictureManager.getPictureById(idPic);
             User user = sessionManager.getUser(key);
             if(!pictureManager.getPictures(user.getUsername()).getTarget().contains(pic)) {

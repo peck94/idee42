@@ -18,7 +18,7 @@ public class NewUserParser extends UserParser {
         
         try{
             User user = new User(
-                0,
+                -1,
                 object.get("username").getAsString(),
                 new HashedString(object.get("password").getAsString(), false),
                 new Email(object.get("email").getAsString()));

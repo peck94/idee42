@@ -59,6 +59,11 @@
           </div>
           <div class="col-md-3"></div>
       </div>
+      <div class="row">
+          <div class="col-md-12">
+              <button class="btn btn-danger btn-lg" onclick="deleteAccount()">Delete account</button>
+          </div>
+      </div>
 
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -149,6 +154,24 @@
                 alert('Failed to delete picture!\n' + data.responseJSON.message);
                 console.log(data);
             });
+        }
+        
+        function deleteAccount() {
+            if(confirm('Are you sure?')) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: '/api/user',
+                    beforeSend: function(req){
+                        req.setRequestHeader('auth', Cookies.get('auth'));
+                    }
+                }).done(function() {
+                    alert('Account deleted!');
+                    location.href = '/';
+                }).fail(function(data) {
+                    alert('Failed to delete account!\n' + data.responseJSON.message);
+                    console.log(data);
+                });
+            }
         }
         
         setTimeout('getPictures()', 500);

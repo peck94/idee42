@@ -60,7 +60,7 @@ public class PictureParser extends Parser<Picture> {
                     DateConverter.toDate(object.get("date").getAsString()),
                     object.get("likes").getAsLong(),
                     object.get("dislikes").getAsLong(),
-                    new BigInteger(object.get("id").getAsString()),
+                    object.get("id").getAsLong(),
                     new User(object.get("owner").getAsLong()),
                     actors,
                     object.get("expired").getAsBoolean()

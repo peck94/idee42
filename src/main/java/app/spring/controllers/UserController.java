@@ -1,6 +1,10 @@
 package app.spring.controllers;
 
+import app.controllers.PictureManager;
+import app.controllers.SessionManager;
 import app.controllers.UserManager;
+import app.domain.pictures.Picture;
+import app.domain.users.SessionKey;
 import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
@@ -11,8 +15,9 @@ import app.spring.messages.OkMessage;
 import java.text.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,6 +33,12 @@ public class UserController {
     // store user manager
     @Autowired
     private UserManager userManager;
+    // store session manager
+    @Autowired
+    private SessionManager sessionManager;
+    // picture manager
+    @Autowired
+    private PictureManager pictureManager;
     
     public UserController() {
         // use NewUserParser because the ID won't be filled in
@@ -54,17 +65,34 @@ public class UserController {
     }
     
     /**
-     * List all users.
-     * TODO: remove this method when in production!
-     * @return List of users
-     * @throws app.exceptions.SpringException
+     * Delete account.
+     * This involves deleting the user and all his pictures.
+     * @param auth Session key of account to delete
+     * @return Message
+     * @throws SpringException 
      */
-    @RequestMapping(method=GET)
-    public String list() throws SpringException {
+    @RequestMapping(method=DELETE)
+    public Message delete(@RequestHeader(value="auth") String auth) throws SpringException {
+        // check session
+        SessionKey key = new SessionKey(auth);
+        if(!sessionManager.isLoggedIn(key)) {
+            throw new SpringException("Invalid session.");
+        }
+        
         try{
-            return parser.toJsonArray(userManager.getUsers());
-        }catch(ParseException ex) {
-            throw new SpringException(ex);
+            // delete user
+            User user = sessionManager.getUser(key);
+            userManager.deleteUser(user);
+            // delete all his pictures
+            if(pictureManager.hasPictures(user.getUsername())) {
+                for(Picture pic: pictureManager.getPictures(user.getUsername()).getTarget()) {
+                    pictureManager.deletePicture(pic);
+                }
+            }
+            
+            return new OkMessage();
+        }catch(ControllerException e) {
+            throw new SpringException(e);
         }
     }
 }

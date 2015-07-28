@@ -66,7 +66,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, 1, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.addEntry(picture);
@@ -87,7 +87,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, 1, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.addEntry(picture);
@@ -107,8 +107,8 @@ public class PictureManagerTest {
                     new Email("shit@fuck.com"));
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1, new HashSet<>(), false);
-        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2, new HashSet<>(), false);
+        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, 1, user1, new HashSet<>(), false);
+        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, 10, user2, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -131,7 +131,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, 1, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.upload(user, new MultipartFile() {
@@ -193,7 +193,7 @@ public class PictureManagerTest {
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int likes = 10;
-        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user1, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, 1, user1, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -218,7 +218,7 @@ public class PictureManagerTest {
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int dislikes = 5;
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user1, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, 1, user1, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -240,7 +240,7 @@ public class PictureManagerTest {
         
         User user = new User(0, "shithead1", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, 1, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.addEntry(picture);

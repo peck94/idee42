@@ -1,6 +1,7 @@
 package app.persistency;
 
 import app.domain.pictures.Picture;
+import app.exceptions.DomainException;
 import app.exceptions.PersistencyException;
 
 /**
@@ -18,7 +19,12 @@ public class PicturePersistencyListener extends PersistencyListener<Picture> {
         if(getDAO().exists(model.getId())) {
             getDAO().update(model);
         }else{
-            getDAO().create(model);
+            long id = (long) getDAO().create(model);
+            try {
+                model.setId(id);
+            } catch (DomainException ex) {
+                throw new PersistencyException(ex);
+            }
         }
     }
 
