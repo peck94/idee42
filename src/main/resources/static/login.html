@@ -22,17 +22,40 @@
   </head>
   <body>
       <div class="jumbotron">
-          <h1>Login</h1>
-          Login here with your username and password.
-          Don't have an account yet? <a href="register.html">Register now!</a>
+          <h1>Idee42</h1>
+          Please note that this is a demo application not meant for public consumption.
       </div>
-      
+      <ul class="nav nav-tabs">
+          <li role="presentation">
+            <a href="index.html" role="button">Home</a>
+          </li>
+          <li role="presentation">
+              <a href="register.html" role="button">Register</a>
+          </li>
+          <li role="presentation" class="active">
+            <a href="login.html" role="button">Login</a>
+          </li>
+          <li role="presentation">
+              <a href="upload.html" role="button">Upload</a>
+          </li>
+          <li role="presentation">
+              <a href="rate.html" role="button">Rate</a>
+          </li>
+          <li role="presentation">
+              <a href="logout.html" role="button">Logout</a>
+          </li>
+      </ul>
       <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
+            <h2>Login</h2>
+            Login here with your username and password.
+            Don't have an account yet? <a href="register.html">Register now!</a>
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Username" id="username">
                 <input type="password" class="form-control" placeholder="Password" id="pass">
+            </div>
+            <div class="btn-group">
                 <button class="btn btn-primary" onclick="login()">Submit</button>
             </div>
           </div>

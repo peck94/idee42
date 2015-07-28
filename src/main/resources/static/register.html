@@ -22,20 +22,44 @@
   </head>
   <body>
       <div class="jumbotron">
-          <h1>Register</h1>
-          Create a new user account.
+          <h1>Idee42</h1>
+          Please note that this is a demo application not meant for public consumption.
       </div>
-      
+      <ul class="nav nav-tabs">
+          <li role="presentation">
+            <a href="index.html" role="button">Home</a>
+          </li>
+          <li role="presentation" class="active">
+              <a href="register.html" role="button">Register</a>
+          </li>
+          <li role="presentation">
+            <a href="login.html" role="button">Login</a>
+          </li>
+          <li role="presentation">
+              <a href="upload.html" role="button">Upload</a>
+          </li>
+          <li role="presentation">
+              <a href="rate.html" role="button">Rate</a>
+          </li>
+          <li role="presentation">
+              <a href="logout.html" role="button">Logout</a>
+          </li>
+      </ul>
       <div class="row">
           <div class="col-md-3"></div>
           <div class="col-md-6">
+              <h2>Register</h2>
+              Create a new user account.
+              
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Username" id="username">
                 <input type="email" class="form-control" placeholder="E-mail address" id="email">
                 <input type="password" class="form-control" placeholder="Password" id="pass">
                 <input type="password" class="form-control" placeholder="Verify password" id="pass2">
-                <button class="btn btn-primary" onclick="register()">Submit</button>
             </div>
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="register()">Submit</button>
+              </div>
           </div>
           <div class="col-md-3"></div>
       </div>
