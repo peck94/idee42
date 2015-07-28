@@ -75,11 +75,36 @@
                 }
             })
             .done(function(data) {
-                alert('Images fetched!');
-                console.log(data);
+                images = JSON.parse(data);
+                for(i = 0; i < images.length; i++) {
+                    image = images[i];
+                    
+                    container = $('<div class="thumbnail">');
+                        img = $('<img>');
+                        img.attr('src', 'data:image/png;base64,' + image.data);
+                        img.appendTo(container);
+                        
+                        stat = $('<div>');
+                        stat.append('<span class="glyphicon glyphicon-thumbs-up"></span> ' + image.likes + '&nbsp;');
+                        stat.append('<span class="glyphicon glyphicon-thumbs-down"></span> ' + image.dislikes);
+                        stat.appendTo(container);
+                        
+                        dt = $('<div>');
+                        dt.append('<span class="glyphicon glyphicon-time"></span> ' + image.date);
+                        dt.appendTo(container);
+                        
+                        expired = $('<div>');
+                        if(image.expired) {
+                            expired.append('<span class="glyphicon glyphicon-remove-circle"></span> Expired');
+                        }else{
+                            expired.append('<span class="glyphicon glyphicon-ok-circle"></span> Not expired yet');
+                        }
+                        expired.appendTo(container);
+                    container.appendTo('#pictures');
+                }
             })
             .fail(function(data) {
-                alert('Failed to fetch an image!\n' + data.responseJSON.message);
+                alert('Failed to fetch images!\n' + data.responseJSON.message);
                 console.log(data);
             });
         }
