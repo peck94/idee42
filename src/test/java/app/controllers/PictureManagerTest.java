@@ -230,4 +230,23 @@ public class PictureManagerTest {
         assertTrue(p2.getActors().contains(user2));
     }
     
+    /**
+     * Test of deletePicture method, of class PictureManager.
+     */
+    @Test
+    public void testDeletePicture() throws Exception {
+        UserManager uman = new UserManager(new DummyPersistencyCommunicator());
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
+        
+        User user = new User(0, "shithead1", new HashedString("shit", false),
+                    new Email("shit@fuck.com"));
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
+        
+        uman.addUser(user);
+        pman.addEntry(picture);
+        
+        pman.deletePicture(picture);
+        assertEquals(pman.getPictures(user.getUsername()).getTarget().size(), 0);
+    }
+    
 }

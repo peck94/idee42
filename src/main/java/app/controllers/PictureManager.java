@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.Executors;
 import org.springframework.web.multipart.MultipartFile;
 /**
  * Stores all pictures and their associated users.
@@ -29,12 +28,10 @@ public class PictureManager extends Controller {
     private final Map<BigInteger, Picture> pictures;
     // store RNG
     private final Random rng;
-    // store validator executor
-    private java.util.concurrent.Executor validator;
+    // store validator thread
+    private Thread validator;
     // store picture timeout
     private final long timeout;
-    // store activity flag
-    private boolean active;
     
     /**
      * This class ensures that expired pictures get marked as such.
@@ -42,15 +39,18 @@ public class PictureManager extends Controller {
     private class Validator implements Runnable {
         @Override
         public void run() {
-            active = true;
             while(pictures.size() > 0) {
                 long minDiff = timeout;
                 Date d = new Date();
                 for(Picture p: pictures.values()) {
+                    // don't bother with expired ones
+                    if(p.isExpired()) {
+                        continue;
+                    }
+                    
+                    // check expiry
                     long diff = d.getTime() - p.getDate().getTime();
-                    System.out.println(diff);
-                    if(diff > timeout) {
-                        // mark picture as expired
+                    if(timeout-diff < 0) {
                         try{
                             p.setExpired(true);
                         }catch(DomainException e) {
@@ -68,7 +68,6 @@ public class PictureManager extends Controller {
                     break;
                 }
             }
-            active = false;
         }
     }
     
@@ -84,9 +83,8 @@ public class PictureManager extends Controller {
         assocs = new HashMap<>();
         pictures = new HashMap<>();
         rng = new Random();
-        validator = Executors.newSingleThreadExecutor();
+        validator = new Thread();
         this.timeout = timeout;
-        active = false;
     }
     
     /**
@@ -120,13 +118,24 @@ public class PictureManager extends Controller {
         pictures.put(picture.getId(), picture);
         
         // start validator if necessary
-        if(!active) {
-            validator.execute(new Validator());
+        if(!validator.isAlive()) {
+            validator = new Thread(new Validator());
+            validator.start();
         }
         
         // try to update persistency
         try{
             getCommunicator().registerPicture(picture);
+            
+            /*
+            * We need to check the expiry here, because Validator doesn't take
+            * into account the possibility of adding pictures after their
+            * expiry date. This should only happen during init.
+            */
+            long diff = (new Date()).getTime() - picture.getDate().getTime();
+            if(!picture.isExpired() && diff > timeout) {
+                picture.setExpired(true);
+            }
         }catch(DomainException e) {
             throw new ControllerException(e);
         }
@@ -213,7 +222,7 @@ public class PictureManager extends Controller {
      * @return Picture with this ID
      * @throws ControllerException Picture not found
      */
-    private Picture getPictureById(BigInteger id) throws ControllerException {
+    public Picture getPictureById(BigInteger id) throws ControllerException {
         // fetch the picture from our repo
         if(pictures.containsKey(id)) {
             return pictures.get(id);
@@ -245,6 +254,21 @@ public class PictureManager extends Controller {
     public void dislikePicture(User user, BigInteger id) throws ControllerException {
         try{
             getPictureById(id).dislike(user);
+        }catch(DomainException e) {
+            throw new ControllerException(e);
+        }
+    }
+    
+    /**
+     * Delete picture by ID.
+     * @param pic The picture
+     * @throws app.exceptions.ControllerException
+     */
+    public void deletePicture(Picture pic) throws ControllerException {
+        try{
+            assocs.get(pic.getOwner().getUsername()).deletePicture(pic);
+            pictures.remove(pic.getId());
+            pic.delete();
         }catch(DomainException e) {
             throw new ControllerException(e);
         }

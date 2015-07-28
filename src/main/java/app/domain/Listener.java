@@ -13,4 +13,11 @@ public interface Listener {
      * @throws app.exceptions.DomainException If update fails
      */
     void update(Observable o) throws DomainException;
+    
+    /**
+     * Notify the listener that the model has been deleted.
+     * @param o The model that was deleted
+     * @throws DomainException 
+     */
+    void delete(Observable o) throws DomainException;
 }

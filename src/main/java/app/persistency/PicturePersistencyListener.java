@@ -21,5 +21,10 @@ public class PicturePersistencyListener extends PersistencyListener<Picture> {
             getDAO().create(model);
         }
     }
+
+    @Override
+    public void deleteModel(Picture model) throws PersistencyException {
+        getDAO().delete(model.getId());
+    }
     
 }

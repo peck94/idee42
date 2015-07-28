@@ -32,10 +32,21 @@ public abstract class PersistencyListener<T extends Observable> implements Liste
         }
     }
     
+    @Override
+    public void delete(Observable o) throws DomainException {
+        T model = (T) o;
+        try{
+            deleteModel(model);
+        }catch(PersistencyException e) {
+            throw new DomainException(e);
+        }
+    }
+    
     protected DataAccessObject getDAO() {
         return dao;
     }
     
     protected abstract void updateModel(T model) throws PersistencyException;
+    protected abstract void deleteModel(T model) throws PersistencyException;
     
 }

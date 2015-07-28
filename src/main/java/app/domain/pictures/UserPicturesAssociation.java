@@ -26,4 +26,12 @@ public class UserPicturesAssociation extends Association<User, ArrayList<Picture
     public void addPicture(Picture picture) {
         super.getTarget().add(picture);
     }
+    
+    /**
+     * Remove a picture from this association.
+     * @param picture Picture to remove
+     */
+    public void deletePicture(Picture picture) {
+        super.getTarget().remove(picture);
+    }
 }

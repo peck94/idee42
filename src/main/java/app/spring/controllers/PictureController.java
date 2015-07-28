@@ -8,12 +8,17 @@ import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.SpringException;
 import app.parsers.PictureParser;
+import app.spring.messages.Message;
+import app.spring.messages.OkMessage;
 import java.math.BigInteger;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -100,11 +105,15 @@ public class PictureController {
     
     /**
      * Get a listing of all pictures owned by a certain user.
+     * This method only returns a list of IDs. Returning a JSON array of all
+     * pictures at once would risk overloading the network when a user has many
+     * pictures.
      * @param auth Session key
+     * @return List of IDs
      * @throws app.exceptions.SpringException
      */
     @RequestMapping(value="/api/pictures", method=GET)
-    public String list(
+    public List<BigInteger> list(
         @RequestHeader(value="auth") String auth) throws SpringException {
         SessionKey key = new SessionKey(auth);
         if(!sessionManager.isLoggedIn(key)) {
@@ -114,8 +123,75 @@ public class PictureController {
         try{
             User user = sessionManager.getUser(key);
             List<Picture> pics = pictureManager.getPictures(user.getUsername()).getTarget();
-            return parser.toJsonArray(pics);
+            List<BigInteger> ids = new ArrayList<>();
+            for(Picture pic: pics) {
+                ids.add(pic.getId());
+            }
+            return ids;
+        }catch(ControllerException e) {
+            throw new SpringException(e);
+        }
+    }
+    
+    /**
+     * Get a picture by ID.
+     * Users can only request their own images.
+     * @param auth Session key
+     * @param id ID of picture
+     * @return Picture
+     * @throws app.exceptions.SpringException
+     */
+    @RequestMapping(value="/api/pictures/{id}", method=GET)
+    public String getPicture(
+        @RequestHeader(value="auth") String auth,
+        @PathVariable(value="id") String id) throws SpringException {
+        SessionKey key = new SessionKey(auth);
+        if(!sessionManager.isLoggedIn(key)) {
+            throw new SpringException("Invalid session");
+        }
+        
+        try{
+            BigInteger idPic = new BigInteger(id);
+            Picture pic = pictureManager.getPictureById(idPic);
+            User user = sessionManager.getUser(key);
+            if(!pictureManager.getPictures(user.getUsername()).getTarget().contains(pic)) {
+                throw new SpringException("Invalid picture.");
+            }
+            
+            return parser.toJson(pic);
         }catch(ControllerException | ParseException e) {
+            throw new SpringException(e);
+        }
+    }
+    
+    /**
+     * Delete picture by ID.
+     * Users can only delete their own images.
+     * @param auth Session key
+     * @param id ID of picture
+     * @return Picture
+     * @throws app.exceptions.SpringException
+     */
+    @RequestMapping(value="/api/pictures/{id}", method=DELETE)
+    public Message delPicture(
+        @RequestHeader(value="auth") String auth,
+        @PathVariable(value="id") String id) throws SpringException {
+        SessionKey key = new SessionKey(auth);
+        if(!sessionManager.isLoggedIn(key)) {
+            throw new SpringException("Invalid session");
+        }
+        
+        try{
+            BigInteger idPic = new BigInteger(id);
+            Picture pic = pictureManager.getPictureById(idPic);
+            User user = sessionManager.getUser(key);
+            if(!pictureManager.getPictures(user.getUsername()).getTarget().contains(pic)) {
+                throw new SpringException("Invalid picture.");
+            }
+            
+            pictureManager.deletePicture(pic);
+            return new OkMessage();
+        }catch(ControllerException e) {
             throw new SpringException(e);
         }
     }

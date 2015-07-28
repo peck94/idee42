@@ -21,5 +21,10 @@ public class UserPersistencyListener extends PersistencyListener<User> {
             getDAO().create(model);
         }
     }
+
+    @Override
+    protected void deleteModel(User model) throws PersistencyException {
+        getDAO().delete(model.getId());
+    }
     
 }

@@ -42,4 +42,14 @@ public abstract class Observable {
             l.update(this);
         }
     }
+    
+    /**
+     * Tell all listeners we're going down.
+     * @throws DomainException 
+     */
+    public void delete() throws DomainException {
+        for(Listener l: listeners) {
+            l.delete(this);
+        }
+    }
 }

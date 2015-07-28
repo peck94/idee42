@@ -54,6 +54,7 @@
             <h2>My pictures</h2>
             A listing of pictures you uploaded.
             
+            <p id="status"></p>
             <div id="pictures"></div>
           </div>
           <div class="col-md-3"></div>
@@ -67,6 +68,7 @@
     
     <script>
         function getPictures() {
+            $('#status').html('Loading...');
             $.ajax({
                 type: 'GET',
                 url: '/api/pictures',
@@ -74,37 +76,77 @@
                     req.setRequestHeader('auth', Cookies.get('auth'));
                 }
             })
-            .done(function(data) {
-                images = JSON.parse(data);
+            .done(function(images) {
+                $('#status').html('Total: ' + images.length);
+                // fetch ids
                 for(i = 0; i < images.length; i++) {
-                    image = images[i];
-                    
-                    container = $('<div class="thumbnail">');
-                        img = $('<img>');
-                        img.attr('src', 'data:image/png;base64,' + image.data);
-                        img.appendTo(container);
-                        
-                        stat = $('<div>');
-                        stat.append('<span class="glyphicon glyphicon-thumbs-up"></span> ' + image.likes + '&nbsp;');
-                        stat.append('<span class="glyphicon glyphicon-thumbs-down"></span> ' + image.dislikes);
-                        stat.appendTo(container);
-                        
-                        dt = $('<div>');
-                        dt.append('<span class="glyphicon glyphicon-time"></span> ' + image.date);
-                        dt.appendTo(container);
-                        
-                        expired = $('<div>');
-                        if(image.expired) {
-                            expired.append('<span class="glyphicon glyphicon-remove-circle"></span> Expired');
-                        }else{
-                            expired.append('<span class="glyphicon glyphicon-ok-circle"></span> Not expired yet');
+                    // fetch image
+                    idImage = images[i];
+                    $.ajax({
+                        type: 'GET',
+                        url: '/api/pictures/' + idImage,
+                        beforeSend: function(req){
+                            req.setRequestHeader('auth', Cookies.get('auth'));
                         }
-                        expired.appendTo(container);
-                    container.appendTo('#pictures');
+                    }).done(function(data) {
+                        // parse data
+                        image = JSON.parse(data);
+
+                        // construct thumbnail
+                        container = $('<div class="thumbnail">');
+                            img = $('<img>');
+                            img.attr('src', 'data:image/png;base64,' + image.data);
+                            img.appendTo(container);
+
+                            stat = $('<div>');
+                            stat.append('<span class="glyphicon glyphicon-thumbs-up"></span> ' + image.likes + '&nbsp;');
+                            stat.append('<span class="glyphicon glyphicon-thumbs-down"></span> ' + image.dislikes);
+                            stat.appendTo(container);
+
+                            dt = $('<div>');
+                            dt.append('<span class="glyphicon glyphicon-time"></span> ' + image.date);
+                            dt.appendTo(container);
+
+                            expired = $('<div>');
+                            if(image.expired) {
+                                expired.append('<span class="glyphicon glyphicon-remove-circle"></span> Expired');
+                            }else{
+                                expired.append('<span class="glyphicon glyphicon-ok-circle"></span> Not expired yet');
+                            }
+                            expired.appendTo(container);
+
+                            btnDel = $('<button><span class="glyphicon glyphicon-remove"></span> Delete</button>');
+                            btnDel.attr('class', 'btn btn-danger');
+                            btnDel.click(function(id) {
+                                return function() {
+                                    deletePic(id);
+                                };
+                            }(image.id));
+                            btnDel.appendTo(container);
+                        container.appendTo('#pictures');
+                    }).fail(function(data) {
+                        alert('Failed to fetch an image!');
+                        console.log(data);
+                    });
                 }
-            })
-            .fail(function(data) {
+            }).fail(function(data) {
                 alert('Failed to fetch images!\n' + data.responseJSON.message);
+                console.log(data);
+            });
+        }
+        
+        function deletePic(id) {
+            $.ajax({
+                type: 'DELETE',
+                url: '/api/pictures/' + id,
+                beforeSend: function(req){
+                    req.setRequestHeader('auth', Cookies.get('auth'));
+                }
+            }).done(function() {
+                alert('Picture deleted!');
+                location.reload();
+            }).fail(function(data) {
+                alert('Failed to delete picture!\n' + data.responseJSON.message);
                 console.log(data);
             });
         }
