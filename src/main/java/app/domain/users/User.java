@@ -85,6 +85,6 @@ public class User extends Observable {
 
     @Override
     public int hashCode() {
-        return getUsername().hashCode();
+        return (int)getId();
     }
 }

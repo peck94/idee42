@@ -115,6 +115,19 @@ public class PictureManager extends Controller {
         
         // choose a random picture not owned by excluded user
         List<Picture> pics = new ArrayList<>(pictures.values());
+        // verify that we haven't already judged every other picture
+        boolean found = false;
+        for(Picture p: pics) {
+            if(p.getOwner().getId() != exclude.getId() && !p.getActors().contains(exclude)) {
+                found = true;
+                break;
+            }
+        }
+        if(!found) {
+            throw new ControllerException("No pictures available at the moment");
+        }
+        
+        // return random pic
         Picture pic;
         do{
             pic = pics.get(rng.nextInt(pics.size()));
