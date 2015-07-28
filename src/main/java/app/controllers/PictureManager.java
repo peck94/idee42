@@ -7,7 +7,6 @@ import app.domain.users.User;
 import app.exceptions.ControllerException;
 import app.exceptions.DomainException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -99,28 +98,12 @@ public class PictureManager extends Controller {
         if(!userManager.exists(user.getUsername())) {
             throw new ControllerException("Unknown user: " + user.getUsername());
         }
-        
-        // check for duplicate pictures
-        if(pictures.containsKey(picture.getId())) {
-            throw new ControllerException("Duplicate picture: " + picture.getId());
-        }
-        
+
         // check for existing association
         if(!assocs.containsKey(user.getUsername())) {
             // you must be new here
             assocs.put(user.getUsername(),
                     new UserPicturesAssociation(user));
-        }
-        
-        // add picture to existing association
-        assocs.get(user.getUsername()).addPicture(picture);
-        // put picture in repo
-        pictures.put(picture.getId(), picture);
-        
-        // start validator if necessary
-        if(!validator.isAlive()) {
-            validator = new Thread(new Validator());
-            validator.start();
         }
         
         // try to update persistency
@@ -138,6 +121,17 @@ public class PictureManager extends Controller {
             }
         }catch(DomainException e) {
             throw new ControllerException(e);
+        }
+        
+        // add picture to existing association
+        assocs.get(user.getUsername()).addPicture(picture);
+        // put picture in repo
+        pictures.put(picture.getId(), picture);
+        
+        // start validator if necessary
+        if(!validator.isAlive()) {
+            validator = new Thread(new Validator());
+            validator.start();
         }
     }
     

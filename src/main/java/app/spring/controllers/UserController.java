@@ -56,6 +56,9 @@ public class UserController {
         // attempt to create a new user
         try {
             User user = parser.fromJson(body);
+            if(!user.getEmail().verify()) {
+                throw new SpringException("Invalid e-mail address.");
+            }
             userManager.addUser(user);
         } catch (ControllerException | ParseException ex) {
             throw new SpringException(ex);
@@ -89,6 +92,8 @@ public class UserController {
                     pictureManager.deletePicture(pic);
                 }
             }
+            // logout
+            sessionManager.logout(key);
             
             return new OkMessage();
         }catch(ControllerException e) {
