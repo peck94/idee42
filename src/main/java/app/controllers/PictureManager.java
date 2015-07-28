@@ -9,6 +9,7 @@ import app.exceptions.DomainException;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,18 +29,61 @@ public class PictureManager extends Controller {
     private final Map<BigInteger, Picture> pictures;
     // store RNG
     private final Random rng;
+    // store validator thread
+    private final Thread validator;
+    
+    /**
+     * This class ensures that expired pictures get marked as such.
+     */
+    private class Validator implements Runnable {
+        private long timeout;
+        
+        public Validator(long timeout) {
+            this.timeout = timeout;
+        }
+        
+        @Override
+        public void run() {
+            while(true) {
+                long minDiff = timeout;
+                Date d = new Date();
+                for(Picture p: pictures.values()) {
+                    long diff = d.getTime() - p.getDate().getTime();
+                    if(diff > timeout) {
+                        // mark picture as expired
+                        try{
+                            p.setExpired(true);
+                        }catch(DomainException e) {
+                            System.out.println(e);
+                        }
+                    }else{
+                        minDiff = Math.min(minDiff, diff);
+                    }
+                }
+                
+                try{
+                    Thread.sleep(minDiff);
+                }catch(InterruptedException e) {
+                    System.out.println(e);
+                    break;
+                }
+            }
+        }
+    }
     
     /**
      * Create new picture manager
      * @param communicator
      * @param userManager User manager
      */
-    public PictureManager(PersistencyCommunicator communicator, UserManager userManager) {
+    public PictureManager(PersistencyCommunicator communicator, UserManager userManager, long timeout) {
         super(communicator);
         this.userManager = userManager;
         assocs = new HashMap<>();
         pictures = new HashMap<>();
         rng = new Random();
+        validator = new Thread(new Validator(timeout));
+        validator.start();
     }
     
     /**

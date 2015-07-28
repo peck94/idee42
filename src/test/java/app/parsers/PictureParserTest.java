@@ -54,7 +54,7 @@ public class PictureParserTest {
         long owner = 0;
         String data = "yolo";
         String encoded = new String(Base64.getEncoder().encode(data.getBytes()));
-        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner), new HashSet<>());
+        Picture picture = new Picture(data.getBytes(), new Date(), 10, 5, BigInteger.ONE, new User(owner), new HashSet<>(), false);
         String json = parser.toJson(picture);
         
         JsonObject object = new JsonParser().parse(json).getAsJsonObject();
@@ -64,6 +64,7 @@ public class PictureParserTest {
         assertEquals(object.get("dislikes").getAsLong(), picture.getDislikes());
         assertEquals(object.get("date").getAsString(), DateConverter.fromDate(picture.getDate()));
         assertEquals(object.get("owner").getAsLong(), owner);
+        assertEquals(object.get("expired").getAsBoolean(), picture.isExpired());
     }
 
     /**
@@ -86,6 +87,7 @@ public class PictureParserTest {
         object.addProperty("date", DateConverter.fromDate(date));
         object.addProperty("owner", 0);
         object.add("actors", new JsonArray());
+        object.addProperty("expired", false);
         
         PictureParser parser = new PictureParser();
         Picture picture = parser.fromJson(object.toString());
@@ -95,6 +97,7 @@ public class PictureParserTest {
         assertEquals(picture.getDislikes(), dislikes);
         assertEquals(DateConverter.fromDate(picture.getDate()), DateConverter.fromDate(date));
         assertEquals(new String(picture.getImage()), data);
+        assertEquals(picture.isExpired(), false);
     }
     
 }

@@ -31,6 +31,7 @@ public class PictureParser extends Parser<Picture> {
         json.addProperty("dislikes", object.getDislikes());
         json.addProperty("date", DateConverter.fromDate(object.getDate()));
         json.addProperty("owner", object.getOwner().getId());
+        json.addProperty("expired", object.isExpired());
         
         JsonArray actors = new JsonArray();
         for(User user: object.getActors()) {
@@ -61,7 +62,8 @@ public class PictureParser extends Parser<Picture> {
                     object.get("dislikes").getAsLong(),
                     new BigInteger(object.get("id").getAsString()),
                     new User(object.get("owner").getAsLong()),
-                    actors
+                    actors,
+                    object.get("expired").getAsBoolean()
             );
 
             return picture;

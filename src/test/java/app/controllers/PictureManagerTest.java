@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Properties;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -29,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
  * @author jonathan
  */
 public class PictureManagerTest {
+    private long timeout;
     
     public PictureManagerTest() {
     }
@@ -42,7 +44,12 @@ public class PictureManagerTest {
     }
     
     @Before
-    public void setUp() {
+    public void setUp() throws IOException {
+        // load config
+        Properties config = new Properties();
+        config.load(Thread.currentThread().getContextClassLoader().getResourceAsStream("application.test.properties"));
+        
+        timeout = Long.parseLong(config.getProperty("pictures.timeout"));
     }
     
     @After
@@ -55,14 +62,19 @@ public class PictureManagerTest {
     @Test
     public void testAddEntry() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.addEntry(picture);
+        
+        assertEquals(pman.getPictures(user.getUsername()).getTarget().size(), 1);
+        assertFalse(pman.getPictures(user.getUsername()).getTarget().get(0).isExpired());
+        Thread.sleep(2*timeout);
+        assertTrue(pman.getPictures(user.getUsername()).getTarget().get(0).isExpired());
     }
 
     /**
@@ -71,11 +83,11 @@ public class PictureManagerTest {
     @Test
     public void testGetPictures() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.addEntry(picture);
@@ -89,14 +101,14 @@ public class PictureManagerTest {
     @Test
     public void testGetRandomPicture() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user1 = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1, new HashSet<>());
-        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2, new HashSet<>());
+        Picture picture1 = new Picture("shit1".getBytes(), new Date(), 10, 5, BigInteger.ONE, user1, new HashSet<>(), false);
+        Picture picture2 = new Picture("shit2".getBytes(), new Date(), 10, 5, BigInteger.TEN, user2, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -115,11 +127,11 @@ public class PictureManagerTest {
     @Test
     public void testUpload() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user = new User(0, "shithead", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>());
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, 5, BigInteger.ONE, user, new HashSet<>(), false);
         
         uman.addUser(user);
         pman.upload(user, new MultipartFile() {
@@ -174,14 +186,14 @@ public class PictureManagerTest {
     @Test
     public void testLikePicture() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user1 = new User(0, "shithead1", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int likes = 10;
-        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user1, new HashSet<>());
+        Picture picture = new Picture("shit".getBytes(), new Date(), likes, 5, BigInteger.ONE, user1, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);
@@ -199,14 +211,14 @@ public class PictureManagerTest {
     @Test
     public void testDislikePicture() throws Exception {
         UserManager uman = new UserManager(new DummyPersistencyCommunicator());
-        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman);
+        PictureManager pman = new PictureManager(new DummyPersistencyCommunicator(), uman, timeout);
         
         User user1 = new User(0, "shithead1", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         User user2 = new User(1, "shithead2", new HashedString("shit", false),
                     new Email("shit@fuck.com"));
         int dislikes = 5;
-        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user1, new HashSet<>());
+        Picture picture = new Picture("shit".getBytes(), new Date(), 10, dislikes, BigInteger.ONE, user1, new HashSet<>(), false);
         
         uman.addUser(user1);
         uman.addUser(user2);

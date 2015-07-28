@@ -80,7 +80,7 @@ public class JDBCPictureDAOTest {
         for(int i = 0; i < COUNT; i++) {
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, 2*i, i*i, BigInteger.ZERO, new User(0), new HashSet<>());
+                    d, 2*i, i*i, BigInteger.ZERO, new User(0), new HashSet<>(), false);
             BigInteger id = dao.create(picture);
             ids.add(id);
         }
@@ -97,7 +97,7 @@ public class JDBCPictureDAOTest {
             BigInteger id = ids.get(i);
             Picture picture = new Picture(
                     new String("yolo" + i).getBytes(),
-                    d, i*i, 2*i, id, new User(0), new HashSet<>());
+                    d, i*i, 2*i, id, new User(0), new HashSet<>(), false);
             dao.update(picture);
             
             Picture picture2 = dao.get(id);

@@ -32,6 +32,8 @@ public class Picture extends Observable {
     private User owner;
     // store likers and dislikers
     private Set<User> actors;
+    // store expiration flag
+    private boolean expired;
     
     /**
      * Create picture from file
@@ -68,7 +70,7 @@ public class Picture extends Observable {
      * @param actors Users who liked or disliked the picture
      */
     public Picture(byte[] image, Date date, long likes, long dislikes,
-            BigInteger id, User owner, Set<User> actors) {
+            BigInteger id, User owner, Set<User> actors, boolean expired) {
         this.image = image;
         this.date = date;
         this.likes = likes;
@@ -76,6 +78,7 @@ public class Picture extends Observable {
         this.id = id;
         this.owner = owner;
         this.actors = actors;
+        this.expired = expired;
     }
     
     public byte[] getImage() {
@@ -100,6 +103,15 @@ public class Picture extends Observable {
     
     public User getOwner() {
         return owner;
+    }
+    
+    public boolean isExpired() {
+        return expired;
+    }
+    
+    public void setExpired(boolean expired) throws DomainException {
+        this.expired = expired;
+        invalidate();
     }
     
     /**

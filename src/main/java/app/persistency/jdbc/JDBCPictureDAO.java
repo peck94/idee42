@@ -23,9 +23,9 @@ import java.util.StringJoiner;
  * @author jonathan
  */
 public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
-    private final String CREATE = "INSERT INTO pictures (image, date, likes, dislikes, owner, actors) VALUES (?, ?, ?, ?, ?, ?)";
-    private final String GET = "SELECT id, image, date, likes, dislikes, owner, actors FROM pictures WHERE id = ?";
-    private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ?, actors = ? WHERE id = ?";
+    private final String CREATE = "INSERT INTO pictures (image, date, likes, dislikes, owner, actors, expired) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private final String GET = "SELECT id, image, date, likes, dislikes, owner, actors, expired FROM pictures WHERE id = ?";
+    private final String UPDATE = "UPDATE pictures SET likes = ?, dislikes = ?, actors = ?, expired = ? WHERE id = ?";
     private final String DELETE = "DELETE FROM pictures WHERE id = ? LIMIT 1";
     private final String LIST = "SELECT * FROM pictures";
     private final String CLEAR = "DELETE FROM pictures";
@@ -59,7 +59,8 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
                     rs.getLong(5),
                     new BigInteger(rs.getString(1)),
                     new User(rs.getLong(6)),
-                    actors
+                    actors,
+                    rs.getBoolean(7)
             );
 
             return picture;
@@ -84,6 +85,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             s.setLong(4, object.getDislikes());
             s.setLong(5, object.getOwner().getId());
             s.setString(6, actors.toString());
+            s.setBoolean(7, object.isExpired());
             s.executeUpdate();
             
             ResultSet rs = s.getGeneratedKeys();
@@ -122,6 +124,7 @@ public class JDBCPictureDAO extends JDBCGenericDAO implements PictureDAO {
             s.setLong(2, newObject.getDislikes());
             s.setString(3, actors.toString());
             s.setString(4, newObject.getId().toString());
+            s.setBoolean(5, newObject.isExpired());
             s.executeUpdate();
         }catch(SQLException e) {
             throw new PersistencyException(e);
